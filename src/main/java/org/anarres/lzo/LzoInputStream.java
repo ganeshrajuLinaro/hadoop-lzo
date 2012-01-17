@@ -1,43 +1,19 @@
 /*
- * This file is part of lzo-java, an implementation of LZO in Java.
- * https://github.com/Karmasphere/lzo-java
+ * This file is part of Hadoop-Gpl-Compression.
  *
- * The Java portion of this library is:
- * Copyright (C) 2011 Shevek <shevek@anarres.org>
- * All Rights Reserved.
+ * Hadoop-Gpl-Compression is free software: you can redistribute it
+ * and/or modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation, either version 3 of
+ * the License, or (at your option) any later version.
  *
- * The preprocessed C portion of this library is:
- * Copyright (C) 2006-2011 Markus Franz Xaver Johannes Oberhumer
- * All Rights Reserved.
+ * Hadoop-Gpl-Compression is distributed in the hope that it will be
+ * useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License 
- * as published by the Free Software Foundation; either version 
- * 2 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty
- * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public
- * License along with the LZO library; see the file COPYING.
- * If not, see <http://www.gnu.org/licenses/> or write to the
- * Free Software Foundation, Inc., 51 Franklin Street, Fifth
- * Floor, Boston, MA 02110-1301, USA.
-
- * As a special exception, the copyright holders of this file
- * give you permission to link this file with independent
- * modules to produce an executable, regardless of the license 
- * terms of these independent modules, and to copy and distribute
- * the resulting executable under terms of your choice, provided
- * that you also meet, for each linked independent module, 
- * the terms and conditions of the license of that module. An
- * independent module is a module which is not derived from or 
- * based on this library or file. If you modify this file, you may 
- * extend this exception to your version of the file, but
- * you are not obligated to do so. If you do not wish to do so,
- * delete this exception statement from your version.
+ * You should have received a copy of the GNU General Public License
+ * along with Hadoop-Gpl-Compression.  If not, see
+ * <http://www.gnu.org/licenses/>.
  */
 package org.anarres.lzo;
 
@@ -47,20 +23,18 @@ import java.io.InputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/**
- *
- * @author shevek
- */
 public class LzoInputStream extends InputStream {
 
-    private static final Log LOG = LogFactory.getLog(LzoInputStream.class.getName());
+    private static final Log LOG = 
+      LogFactory.getLog(LzoInputStream.class.getName());
     private static final byte[] EMPTY_BYTE_ARRAY = new byte[0];
     protected final InputStream in;
     private final LzoDecompressor decompressor;
     protected byte[] inputBuffer = EMPTY_BYTE_ARRAY;
     protected byte[] outputBuffer = EMPTY_BYTE_ARRAY;
     protected int outputBufferPos;
-    protected final lzo_uintp outputBufferLen = new lzo_uintp();	// Also, end, since we base outputBuffer at 0.
+    // Also, end, since we base outputBuffer at 0.
+    protected final lzo_uintp outputBufferLen = new lzo_uintp();
 
     public LzoInputStream(InputStream in, LzoDecompressor decompressor) {
         this.in = in;
@@ -107,8 +81,9 @@ public class LzoInputStream extends InputStream {
     protected void logState(String when) {
         LOG.info("\n");
         LOG.info(when + " Input buffer size=" + inputBuffer.length);
-        LOG.info(when + " Output buffer pos=" + outputBufferPos + "; length=" + outputBufferLen + "; size=" + outputBuffer.length);
-        // testInvariants();
+        LOG.info(when + " Output buffer pos=" + outputBufferPos + 
+		 "; length=" + outputBufferLen + "; size=" + 
+		 outputBuffer.length);
     }
 
     private boolean fill() throws IOException {

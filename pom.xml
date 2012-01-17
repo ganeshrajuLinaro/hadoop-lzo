@@ -20,10 +20,49 @@
 
   <developers>
     <developer>
-      <id>shevek</id>
-      <name>Shevek</name>
-      <email>contact@anarres.org</email>
-      <url>http://www.anarres.org/</url>
+      <id>angushe</id>
+      <name>Angus He</name>
+      <email>angushe@gmail.com</email>
+    </developer>
+    <developer>
+      <id>cdouglas</id>
+      <name>Chris Douglas</name>
+      <email>cdouglas@apache.org</email>
+    </developer>
+    <developer>
+      <id>dvryaboy</id>
+      <name>Dmitriy Ryaboy</name>
+      <email>dvryaboy@gmail.com</email>
+    </developer>
+    <developer>
+      <id>ilyam</id>
+      <name>Ilya Maykov</name>
+      <email>ilyam@ooyala.com</email>
+    </developer>
+    <developer>
+      <id>jseigel</id>
+      <name>James Seigel</name>
+      <email>github@paddlethis.com</email>
+    </developer>
+    <developer>
+      <id>yaojingguo</id>
+      <name>Jingguo Yao</name>
+      <email>yaojingguo@gmail.com</email>
+    </developer>
+    <developer>
+      <id>kevinweil</id>
+      <name>Kevin Weil</name>
+      <email>kevinweil@gmail.com</email>
+    </developer>
+    <developer>
+      <id>mark</id>
+      <name>Mark H. Butler</name>
+      <email>omarkhenrybutler@googlemail.com</email>
+    </developer>
+    <developer>
+      <id>michael</id>
+      <name>Michael G. Noll</name>
+      <email>michael@michael-noll.com</email>
     </developer>
     <developer>
       <id>omalley</id>
@@ -31,6 +70,27 @@
       <email>omalley@apache.org</email>
       <url>http://people.apache.org/~omalley</url>
       <timezone>-8</timezone>
+    </developer>
+    <developer>
+      <id>rangadi</id>
+      <name>Raghu Agnadi</name>
+      <email>rangadi@apache.org</email>
+    </developer>
+    <developer>
+      <id>shevek</id>
+      <name>Shevek</name>
+      <email>contact@anarres.org</email>
+      <url>http://www.anarres.org/</url>
+    </developer>
+    <developer>
+      <id>tlipcon</id>
+      <name>Todd Lipcon</name>
+      <email>todd@lipcon.org</email>
+    </developer>
+    <developer>
+      <id>travis</id>
+      <name>Travis Crawford</name>
+      <email>travis@twitter.com</email>
     </developer>
   </developers>
 

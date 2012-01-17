@@ -1,28 +1,19 @@
 /*
- * This file is part of lzo-java, an implementation of LZO in Java.
- * https://github.com/Karmasphere/lzo-java
+ * This file is part of Hadoop-Gpl-Compression.
  *
- * The Java portion of this library is:
- * Copyright (C) 2011 Shevek <shevek@anarres.org>
- * All Rights Reserved.
+ * Hadoop-Gpl-Compression is free software: you can redistribute it
+ * and/or modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation, either version 3 of
+ * the License, or (at your option) any later version.
  *
- * This file is based on a file from hadoop-gpl-compression.
+ * Hadoop-Gpl-Compression is distributed in the hope that it will be
+ * useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License 
- * as published by the Free Software Foundation; either version 
- * 2 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty
- * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public
- * License along with the LZO library; see the file COPYING.
- * If not, see <http://www.gnu.org/licenses/> or write to the
- * Free Software Foundation, Inc., 51 Franklin Street, Fifth
- * Floor, Boston, MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License
+ * along with Hadoop-Gpl-Compression.  If not, see
+ * <http://www.gnu.org/licenses/>.
  */
 package com.hadoop.compression.lzo;
 
