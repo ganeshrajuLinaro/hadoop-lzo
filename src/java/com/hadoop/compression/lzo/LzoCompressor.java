@@ -18,6 +18,7 @@
 
 package com.hadoop.compression.lzo;
 
+
 import java.io.IOException;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
@@ -26,6 +27,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.compress.Compressor;
+
 
 /**
  * A {@link Compressor} based on the lzo algorithm.
@@ -53,97 +55,59 @@ class LzoCompressor implements Compressor {
 
   private CompressionStrategy strategy; // The lzo compression algorithm.
   @SuppressWarnings("unused")
-  private long lzoCompressor = 0;       // The actual lzo compression function.
-  private int workingMemoryBufLen = 0;  // The length of 'working memory' buf.
+  private long lzoCompressor = 0; // The actual lzo compression function.
+  private int workingMemoryBufLen = 0; // The length of 'working memory' buf.
   @SuppressWarnings("unused")
-  private ByteBuffer workingMemoryBuf;      // The 'working memory' for lzo.
+  private ByteBuffer workingMemoryBuf; // The 'working memory' for lzo.
   private int lzoCompressionLevel;
 
   /**
    * Used when the user doesn't specify a configuration. We cache a single
    * one statically, since loading the defaults is expensive.
    */
-  private static Configuration defaultConfiguration =
-    new Configuration();
+  private static Configuration defaultConfiguration = new Configuration();
 
   /**
    * The compression algorithm for lzo library.
    */
   public static enum CompressionStrategy {
+
     /**
      * lzo1 algorithms.
      */
-    LZO1 (0),
-    LZO1_99 (1),
-
+    LZO1 (0), LZO1_99 (1), 
     /**
      * lzo1a algorithms.
      */
-    LZO1A (2),
-    LZO1A_99 (3),
-
+    LZO1A (2), LZO1A_99 (3), 
     /**
      * lzo1b algorithms.
      */
-    LZO1B (4),
-    LZO1B_BEST_COMPRESSION(5),
-    LZO1B_BEST_SPEED(6),
-    LZO1B_1 (7),
-    LZO1B_2 (8),
-    LZO1B_3 (9),
-    LZO1B_4 (10),
-    LZO1B_5 (11),
-    LZO1B_6 (12),
-    LZO1B_7 (13),
-    LZO1B_8 (14),
-    LZO1B_9 (15),
-    LZO1B_99 (16),
-    LZO1B_999 (17),
-
+    LZO1B (4), LZO1B_BEST_COMPRESSION(5), LZO1B_BEST_SPEED(6), LZO1B_1 (7), 
+    LZO1B_2 (8), LZO1B_3 (9), LZO1B_4 (10), LZO1B_5 (11), LZO1B_6 (12), 
+    LZO1B_7 (13), LZO1B_8 (14), LZO1B_9 (15), LZO1B_99 (16), LZO1B_999 (17),
     /**
      * lzo1c algorithms.
      */
-    LZO1C (18),
-    LZO1C_BEST_COMPRESSION(19),
-    LZO1C_BEST_SPEED(20),
-    LZO1C_1 (21),
-    LZO1C_2 (22),
-    LZO1C_3 (23),
-    LZO1C_4 (24),
-    LZO1C_5 (25),
-    LZO1C_6 (26),
-    LZO1C_7 (27),
-    LZO1C_8 (28),
-    LZO1C_9 (29),
-    LZO1C_99 (30),
-    LZO1C_999 (31),
-
+    LZO1C (18), LZO1C_BEST_COMPRESSION(19), LZO1C_BEST_SPEED(20), LZO1C_1 (21),
+    LZO1C_2 (22), LZO1C_3 (23), LZO1C_4 (24), LZO1C_5 (25), LZO1C_6 (26), 
+    LZO1C_7 (27), LZO1C_8 (28), LZO1C_9 (29), LZO1C_99 (30), LZO1C_999 (31), 
     /**
      * lzo1f algorithms.
      */
-    LZO1F_1 (32),
-    LZO1F_999 (33),
-
+    LZO1F_1 (32), LZO1F_999 (33), 
     /**
      * lzo1x algorithms.
      */
-    LZO1X_1 (34),
-    LZO1X_11 (35),
-    LZO1X_12 (36),
-    LZO1X_15 (37),
-    LZO1X_999 (38),
-
+    LZO1X_1 (34), LZO1X_11 (35), LZO1X_12 (36), LZO1X_15 (37), LZO1X_999 (38),
     /**
      * lzo1y algorithms.
      */
-    LZO1Y_1 (39),
-    LZO1Y_999 (40),
-
+    LZO1Y_1 (39), LZO1Y_999 (40), 
     /**
      * lzo1z algorithms.
      */
     LZO1Z_999 (41),
-
     /**
      * lzo2a algorithms.
      */
@@ -158,7 +122,10 @@ class LzoCompressor implements Compressor {
     int getCompressor() {
       return compressor;
     }
-  }; // CompressionStrategy
+  }
+
+
+  ; // CompressionStrategy
 
   private static boolean nativeLzoLoaded;
   public static final int LZO_LIBRARY_VERSION;
@@ -174,11 +141,13 @@ class LzoCompressor implements Compressor {
         LOG.warn(t.toString());
         nativeLzoLoaded = false;
       }
-      LZO_LIBRARY_VERSION = (nativeLzoLoaded) ? 0xFFFF & getLzoLibraryVersion()
-          : -1;
+      LZO_LIBRARY_VERSION = (nativeLzoLoaded) ?
+          0xFFFF & getLzoLibraryVersion() :
+          -1;
     } else {
-      LOG.error("Cannot load " + LzoCompressor.class.getName() + 
-      " without native-hadoop library!");
+      LOG.error(
+          "Cannot load " + LzoCompressor.class.getName() +
+          " without native-hadoop library!");
       nativeLzoLoaded = false;
       LZO_LIBRARY_VERSION = -1;
     }
@@ -201,22 +170,24 @@ class LzoCompressor implements Compressor {
   /**
    * Reinitialize from a configuration, possibly changing compression codec
    */
-  //@Override (this method isn't in vanilla 0.20.2, but is in CDH3b3 and YDH)
+  // @Override (this method isn't in vanilla 0.20.2, but is in CDH3b3 and YDH)
   public void reinit(Configuration conf) {
-    // It's possible conf is null in the case that the compressor was got from a pool,
-    // and the new user of the codec doesn't specify a particular configuration
-    // to CodecPool.getCompressor(). So we use the defaults.
+    // It's possible conf is null in the case that the compressor was
+    // got from a pool, and the new user of the codec doesn't specify
+    // a particular configuration to CodecPool.getCompressor(). So we
+    // use the defaults.
     if (conf == null) {
       conf = defaultConfiguration;
     }
-    LzoCompressor.CompressionStrategy strategy = LzoCodec.getCompressionStrategy(conf);
+    LzoCompressor.CompressionStrategy strategy = 
+      LzoCodec.getCompressionStrategy(conf);
     int compressionLevel = LzoCodec.getCompressionLevel(conf);
     int bufferSize = LzoCodec.getBufferSize(conf);
 
     init(strategy, compressionLevel, bufferSize);
   }
 
-  /** 
+  /**
    * Creates a new compressor using the specified {@link CompressionStrategy}.
    * 
    * @param strategy lzo compression algorithm to use
@@ -247,6 +218,7 @@ class LzoCompressor implements Compressor {
         // If this fails, we'll drop the reference and hope GC finds it
         // eventually.
         Object cleaner = buf.getClass().getMethod("cleaner").invoke(buf);
+
         cleaner.getClass().getMethod("clean").invoke(cleaner);
       } catch (Exception e) {
         // Perhaps a non-sun-derived JVM - contributions welcome
@@ -256,7 +228,8 @@ class LzoCompressor implements Compressor {
     return ByteBuffer.allocateDirect(newSize);
   }
 
-  private void init(CompressionStrategy strategy, int compressionLevel, int directBufferSize) {
+  private void init(CompressionStrategy strategy, int compressionLevel, 
+		    int directBufferSize) {
     this.strategy = strategy;
     this.lzoCompressionLevel = compressionLevel;
     this.directBufferSize = directBufferSize;
@@ -277,11 +250,11 @@ class LzoCompressor implements Compressor {
    * Creates a new compressor with the default lzo1x_1 compression.
    */
   public LzoCompressor() {
-    this(CompressionStrategy.LZO1X_1, 64*1024);
+    this(CompressionStrategy.LZO1X_1, 64 * 1024);
   }
 
   public synchronized void setInput(byte[] b, int off, int len) {
-    if (b== null) {
+    if (b == null) {
       throw new NullPointerException();
     }
     if (off < 0 || len < 0 || off > b.length - len) {
@@ -295,7 +268,7 @@ class LzoCompressor implements Compressor {
       this.userBufOff = off;
       this.userBufLen = len;
     } else {
-      ((ByteBuffer)uncompressedDirectBuf).put(b, off, len);
+      ((ByteBuffer) uncompressedDirectBuf).put(b, off, len);
       uncompressedDirectBufLen = uncompressedDirectBuf.position();
     }
     bytesRead += len;
@@ -313,7 +286,8 @@ class LzoCompressor implements Compressor {
     finished = false;
 
     uncompressedDirectBufLen = Math.min(userBufLen, directBufferSize);
-    ((ByteBuffer)uncompressedDirectBuf).put(userBuf, userBufOff,
+    ((ByteBuffer) uncompressedDirectBuf).put(userBuf, userBufOff
+        ,
         uncompressedDirectBufLen);
 
     // Note how much data is being fed to lzo
@@ -325,11 +299,11 @@ class LzoCompressor implements Compressor {
     // nop
   }
 
-  /** {@inheritDoc} */
+  /**
+   * {@inheritDoc} */
   public boolean needsInput() {
-    return !(compressedDirectBuf.remaining() > 0
-        || uncompressedDirectBuf.remaining() == 0
-        || userBufLen > 0);
+    return !(compressedDirectBuf.remaining() > 0 ||
+        uncompressedDirectBuf.remaining() == 0 || userBufLen > 0);
   }
 
   public synchronized void finish() {
@@ -343,7 +317,7 @@ class LzoCompressor implements Compressor {
   }
 
   public synchronized int compress(byte[] b, int off, int len) 
-  throws IOException {
+    throws IOException {
     if (b == null) {
       throw new NullPointerException();
     }
@@ -353,9 +327,10 @@ class LzoCompressor implements Compressor {
 
     // Check if there is compressed data
     int n = compressedDirectBuf.remaining();
+
     if (n > 0) {
       n = Math.min(n, len);
-      ((ByteBuffer)compressedDirectBuf).get(b, off, n);
+      ((ByteBuffer) compressedDirectBuf).get(b, off, n);
       bytesWritten += n;
       return n;
     }
@@ -386,7 +361,7 @@ class LzoCompressor implements Compressor {
     // Get atmost 'len' bytes
     n = Math.min(n, len);
     bytesWritten += n;
-    ((ByteBuffer)compressedDirectBuf).get(b, off, n);
+    ((ByteBuffer) compressedDirectBuf).get(b, off, n);
 
     return n;
   }
@@ -417,13 +392,15 @@ class LzoCompressor implements Compressor {
   }
   
   /**
-   * Return the uncompressed byte buffer contents, for use when the compressed block
-   * would be larger than the uncompressed block, because the LZO spec dictates that
-   * the uncompressed bytes are written to the file in this case.
+   * Return the uncompressed byte buffer contents, for use when the
+   * compressed block would be larger than the uncompressed block,
+   * because the LZO spec dictates that the uncompressed bytes are
+   * written to the file in this case.
    */
   public byte[] uncompressedBytes() {
-    byte[] b = new byte[(int)bytesRead];
-    ((ByteBuffer)uncompressedDirectBuf).get(b);
+    byte[] b = new byte[(int) bytesRead];
+
+    ((ByteBuffer) uncompressedDirectBuf).get(b);
     return b;
   }
 
@@ -437,17 +414,20 @@ class LzoCompressor implements Compressor {
   /**
    * Noop.
    */
-  public synchronized void end() {
-    // nop
+  public synchronized void end() {// nop
   }
 
-  /** used for tests */
+  /**
+   * used for tests */
   CompressionStrategy getStrategy() {
     return strategy;
   }
 
   private native static void initIDs();
+
   private native static int getLzoLibraryVersion();
+
   private native void init(int compressor);
+
   private native int compressBytesDirect(int compressor);
 }

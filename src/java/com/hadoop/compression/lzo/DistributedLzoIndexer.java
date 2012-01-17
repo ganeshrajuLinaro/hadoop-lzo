@@ -1,4 +1,22 @@
+/*
+ * This file is part of Hadoop-Gpl-Compression.
+ *
+ * Hadoop-Gpl-Compression is free software: you can redistribute it
+ * and/or modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation, either version 3 of
+ * the License, or (at your option) any later version.
+ *
+ * Hadoop-Gpl-Compression is distributed in the hope that it will be
+ * useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Hadoop-Gpl-Compression.  If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package com.hadoop.compression.lzo;
+
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -25,8 +43,10 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
+
 public class DistributedLzoIndexer extends Configured implements Tool {
-  private static final Log LOG = LogFactory.getLog(DistributedLzoIndexer.class);
+  private static final Log LOG = 
+    LogFactory.getLog(DistributedLzoIndexer.class);
   private final String LZO_EXTENSION = new LzopCodec().getDefaultExtension();
 
   private final PathFilter nonTemporaryFilter = new PathFilter() {
@@ -35,31 +55,39 @@ public class DistributedLzoIndexer extends Configured implements Tool {
     }
   };
 
-  private void walkPath(Path path, PathFilter pathFilter, List<Path> accumulator) {
+  private void walkPath(Path path, PathFilter pathFilter, 
+			List<Path> accumulator) {
     try {
       FileSystem fs = path.getFileSystem(getConf());
       FileStatus fileStatus = fs.getFileStatus(path);
 
       if (fileStatus.isDir()) {
         FileStatus[] children = fs.listStatus(path, pathFilter);
+
         for (FileStatus childStatus : children) {
           walkPath(childStatus.getPath(), pathFilter, accumulator);
         }
       } else if (path.toString().endsWith(LZO_EXTENSION)) {
         Path lzoIndexPath = path.suffix(LzoIndex.LZO_INDEX_SUFFIX);
+
         if (fs.exists(lzoIndexPath)) {
-          // If the index exists and is of nonzero size, we're already done.
-          // We re-index a file with a zero-length index, because every file has at least one block.
+          // If the index exists and is of nonzero size, we're already
+          // done.  We re-index a file with a zero-length index,
+          // because every file has at least one block.
           if (fs.getFileStatus(lzoIndexPath).getLen() > 0) {
             LOG.info("[SKIP] LZO index file already exists for " + path);
             return;
           } else {
-            LOG.info("Adding LZO file " + path + " to indexing list (index file exists but is zero length)");
+            LOG.info(
+                "Adding LZO file " + path +
+                " to indexing list (index file exists but is zero length)");
             accumulator.add(path);
           }
         } else {
           // If no index exists, we need to index the file.
-          LOG.info("Adding LZO file " + path + " to indexing list (no index currently exists)");
+          LOG.info(
+              "Adding LZO file " + path +
+              " to indexing list (no index currently exists)");
           accumulator.add(path);
         }
       }
@@ -76,27 +104,31 @@ public class DistributedLzoIndexer extends Configured implements Tool {
     }
 
     List<Path> inputPaths = new ArrayList<Path>();
+
     for (String strPath: args) {
       walkPath(new Path(strPath), nonTemporaryFilter, inputPaths);
     }
 
     if (inputPaths.isEmpty()) {
-      System.err.println("No input paths found - perhaps all " +
-        ".lzo files have already been indexed.");
+      System.err.println(
+          "No input paths found - perhaps all " +
+              ".lzo files have already been indexed.");
       return 0;
     }
 
     Configuration conf = new Configuration();
     Job job = new Job(conf);
+
     job.setJobName("Distributed Lzo Indexer " + Arrays.toString(args));
 
     job.setOutputKeyClass(Path.class);
     job.setOutputValueClass(LongWritable.class);
 
-    // The LzoIndexOutputFormat doesn't currently work with speculative execution.
-    // Patches welcome.
-    job.getConfiguration().setBoolean(
-      "mapred.map.tasks.speculative.execution", false);
+    // The LzoIndexOutputFormat doesn't currently work with
+    // speculative execution.  Patches welcome.
+    job.getConfiguration().setBoolean("mapred.map.tasks.speculative.execution"
+        ,
+        false);
 
     job.setJarByClass(DistributedLzoIndexer.class);
     job.setInputFormatClass(LzoSplitInputFormat.class);
@@ -113,10 +145,13 @@ public class DistributedLzoIndexer extends Configured implements Tool {
 
   public static void main(String[] args) throws Exception {
     int exitCode = ToolRunner.run(new DistributedLzoIndexer(), args);
+
     System.exit(exitCode);
   }
 
   public static void printUsage() {
-    System.err.println("Usage: hadoop jar /path/to/this/jar com.hadoop.compression.lzo.DistributedLzoIndexer <file.lzo | directory> [file2.lzo directory3 ...]");
+    System.err.println("Usage: hadoop jar /path/to/this/jar " + 
+		       "com.hadoop.compression.lzo.DistributedLzoIndexer " + 
+		       "<file.lzo | directory> [file2.lzo directory3 ...]");
   }
 }

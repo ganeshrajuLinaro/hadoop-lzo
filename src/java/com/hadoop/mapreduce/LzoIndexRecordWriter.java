@@ -1,3 +1,20 @@
+/*
+ * This file is part of Hadoop-Gpl-Compression.
+ *
+ * Hadoop-Gpl-Compression is free software: you can redistribute it
+ * and/or modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation, either version 3 of
+ * the License, or (at your option) any later version.
+ *
+ * Hadoop-Gpl-Compression is distributed in the hope that it will be
+ * useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Hadoop-Gpl-Compression.  If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package com.hadoop.mapreduce;
 
 import java.io.IOException;
@@ -11,6 +28,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.mapreduce.RecordWriter;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
+
 
 public class LzoIndexRecordWriter extends RecordWriter<Path, LongWritable> {
   private static final Log LOG = LogFactory.getLog(LzoIndexRecordWriter.class);
@@ -28,7 +46,8 @@ public class LzoIndexRecordWriter extends RecordWriter<Path, LongWritable> {
   }
 
   @Override
-  public void write(Path path, LongWritable offset) throws IOException, InterruptedException {
+  public void write(Path path, LongWritable offset
+		    ) throws IOException, InterruptedException {
     if (outputStream == null) {
       // Set up the output file on the first record.
       LOG.info("Setting up output stream to write index file for " + path);
@@ -38,12 +57,15 @@ public class LzoIndexRecordWriter extends RecordWriter<Path, LongWritable> {
   }
 
   @Override
-  public void close(TaskAttemptContext taskAttemptContext) throws IOException, InterruptedException {
+  public void close(TaskAttemptContext taskAttemptContext
+		    ) throws IOException, InterruptedException {
     if (outputStream != null) {
       // Close the output stream so that the tmp file is synced, then move it.
       outputStream.close();
 
-      LOG.info("In close, now renaming " + tmpIndexPath + " to final location " + realIndexPath);
+      LOG.info(
+          "In close, now renaming " + tmpIndexPath + " to final location " +
+          realIndexPath);
       // Rename, indexing completed.
       fs.rename(tmpIndexPath, realIndexPath);
     }

@@ -18,8 +18,10 @@
  
 package com.hadoop.compression.lzo;
 
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 
 public class GPLNativeCodeLoader {
 
@@ -28,7 +30,7 @@ public class GPLNativeCodeLoader {
 
   static {
     try {
-      //try to load the lib
+      // try to load the lib
       System.loadLibrary("gplcompression");
       nativeLibraryLoaded = true;
       LOG.info("Loaded native gpl library");

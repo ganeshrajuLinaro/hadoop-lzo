@@ -18,6 +18,7 @@
 
 package com.hadoop.compression.lzo;
 
+
 import java.io.EOFException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -34,6 +35,7 @@ import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.io.compress.CompressionCodec;
 import org.apache.hadoop.io.compress.CompressionCodecFactory;
 
+
 /**
  * Represents the lzo index.
  */
@@ -47,11 +49,12 @@ public class LzoIndex {
   /**
    * Create an empty index, typically indicating no index file exists.
    */
-  public LzoIndex() { }
+  public LzoIndex() {}
 
   /**
    * Create an index specifying the number of LZO blocks in the file.
-   * @param blocks The number of blocks in the LZO file the index is representing.
+   * @param blocks The number of blocks in the LZO file the index is
+   * representing.
    */
   public LzoIndex(int blocks) {
     blockPositions_ = new long[blocks];
@@ -77,9 +80,10 @@ public class LzoIndex {
   /**
    * Get the block offset for a given block.
    * @param block
-   * @return the byte offset into the file where this block starts.  It is the developer's
-   * responsibility to call getNumberOfBlocks() to know appropriate bounds on the parameter.
-   * The argument block should satisfy 0 <= block < getNumberOfBlocks().
+   * @return the byte offset into the file where this block starts.
+   * It is the developer's responsibility to call getNumberOfBlocks()
+   * to know appropriate bounds on the parameter.  The argument block
+   * should satisfy 0 <= block < getNumberOfBlocks().
    */
   public long getPosition(int block) {
     return blockPositions_[block];
@@ -89,7 +93,8 @@ public class LzoIndex {
    * Find the next lzo block start from the given position.
    *
    * @param pos The position to start looking from.
-   * @return Either the start position of the block or -1 if it couldn't be found.
+   * @return Either the start position of the block or -1 if it
+   * couldn't be found.
    */
   public long findNextPosition(long pos) {
     int block = Arrays.binarySearch(blockPositions_, pos);
@@ -116,8 +121,8 @@ public class LzoIndex {
   }
 
   /**
-   * Nudge a given file slice start to the nearest LZO block start no earlier than
-   * the current slice start.
+   * Nudge a given file slice start to the nearest LZO block start no
+   * earlier than the current slice start.
    *
    * @param start The current slice start
    * @param end The current slice end
@@ -129,6 +134,7 @@ public class LzoIndex {
       // find the next block position from
       // the start of the split
       long newStart = findNextPosition(start);
+
       if (newStart == NOT_FOUND || newStart >= end) {
         return NOT_FOUND;
       }
@@ -147,6 +153,7 @@ public class LzoIndex {
    */
   public long alignSliceEndToIndex(long end, long fileSize) {
     long newEnd = findNextPosition(end);
+
     if (newEnd != NOT_FOUND) {
       end = newEnd;
     } else {
@@ -161,11 +168,13 @@ public class LzoIndex {
    * Read the index of the lzo file.
 
    * @param fs The index file is on this file system.
-   * @param lzoFile the file whose index we are reading -- NOT the index file itself.  That is,
-   * pass in filename.lzo, not filename.lzo.index, for this parameter.
+   * @param lzoFile the file whose index we are reading -- NOT the
+   * index file itself.  That is, pass in filename.lzo, not
+   * filename.lzo.index, for this parameter.
    * @throws IOException
    */
-  public static LzoIndex readIndex(FileSystem fs, Path lzoFile) throws IOException {
+  public static LzoIndex readIndex(FileSystem fs, 
+				   Path lzoFile) throws IOException {
     FSDataInputStream indexIn = null;
     Path indexFile = lzoFile.suffix(LZO_INDEX_SUFFIX);
 
@@ -176,14 +185,16 @@ public class LzoIndex {
       return new LzoIndex();
     }
 
-    int capacity = 16 * 1024 * 8; //size for a 4GB file (with 256KB lzo blocks)
+    // size for a 4GB file (with 256KB lzo blocks)
+    int capacity = 16 * 1024 * 8; 
     DataOutputBuffer bytes = new DataOutputBuffer(capacity);
 
     // copy indexIn and close it
-    IOUtils.copyBytes(indexIn, bytes, 4*1024, true);
+    IOUtils.copyBytes(indexIn, bytes, 4 * 1024, true);
 
-    ByteBuffer bytesIn = ByteBuffer.wrap(bytes.getData(), 0, bytes.getLength());
-    int blocks = bytesIn.remaining()/8;
+    ByteBuffer bytesIn = ByteBuffer.wrap(bytes.getData(), 0, 
+					 bytes.getLength());
+    int blocks = bytesIn.remaining() / 8;
     LzoIndex index = new LzoIndex(blocks);
 
     for (int i = 0; i < blocks; i++) {
@@ -194,24 +205,26 @@ public class LzoIndex {
   }
 
   /**
-   * Index an lzo file to allow the input format to split them into separate map
-   * jobs.
+   * Index an lzo file to allow the input format to split them into
+   * separate map jobs.
    *
    * @param fs File system that contains the file.
-   * @param lzoFile the lzo file to index.  For filename.lzo, the created index file will be
-   * filename.lzo.index.
+   * @param lzoFile the lzo file to index.  For filename.lzo, the
+   * created index file will be filename.lzo.index.
    * @throws IOException
    */
   public static void createIndex(FileSystem fs, Path lzoFile)
-  throws IOException {
+    throws IOException {
 
     Configuration conf = fs.getConf();
     CompressionCodecFactory factory = new CompressionCodecFactory(conf);
     CompressionCodec codec = factory.getCodec(lzoFile);
+
     if (null == codec) {
       throw new IOException("Could not find codec for file " + lzoFile +
-        " - you may need to add the LZO codec to your io.compression.codecs " +
-        "configuration in core-site.xml");
+			    " - you may need to add the LZO codec to your " +
+			    "io.compression.codecs configuration in "+
+			    "core-site.xml");
     }
     ((Configurable) codec).setConf(conf);
 
@@ -220,21 +233,27 @@ public class LzoIndex {
     Path outputFile = lzoFile.suffix(LZO_INDEX_SUFFIX);
     Path tmpOutputFile = lzoFile.suffix(LZO_TMP_INDEX_SUFFIX);
 
-    // Track whether an exception was thrown or not, so we know to either
-    // delete the tmp index file on failure, or rename it to the new index file on success.
+    // Track whether an exception was thrown or not, so we know to
+    // either delete the tmp index file on failure, or rename it to
+    // the new index file on success.
     boolean indexingSucceeded = false;
+
     try {
       is = fs.open(lzoFile);
       os = fs.create(tmpOutputFile);
-      LzopDecompressor decompressor = (LzopDecompressor) codec.createDecompressor();
+      LzopDecompressor decompressor = 
+	(LzopDecompressor) codec.createDecompressor();
+
       // Solely for reading the header
       codec.createInputStream(is, decompressor);
       int numCompressedChecksums = decompressor.getCompressedChecksumsCount();
-      int numDecompressedChecksums = decompressor.getDecompressedChecksumsCount();
+      int numDecompressedChecksums = 
+	decompressor.getDecompressedChecksumsCount();
 
       while (true) {
         // read and ignore, we just want to get to the next int
         int uncompressedBlockSize = is.readInt();
+
         if (uncompressedBlockSize == 0) {
           break;
         } else if (uncompressedBlockSize < 0) {
@@ -242,15 +261,19 @@ public class LzoIndex {
         }
 
         int compressedBlockSize = is.readInt();
+
         if (compressedBlockSize <= 0) {
           throw new IOException("Could not read compressed block size");
         }
 
         // See LzopInputStream.getCompressedData
-        boolean isUncompressedBlock = (uncompressedBlockSize == compressedBlockSize);
+        boolean isUncompressedBlock = (uncompressedBlockSize ==
+            compressedBlockSize);
         int numChecksumsToSkip = isUncompressedBlock ?
-            numDecompressedChecksums : numDecompressedChecksums + numCompressedChecksums;
+            numDecompressedChecksums :
+            numDecompressedChecksums + numCompressedChecksums;
         long pos = is.getPos();
+
         // write the pos of the block start
         os.writeLong(pos - 8);
         // seek to the start of the next block, skip any checksums
@@ -269,7 +292,8 @@ public class LzoIndex {
       }
 
       if (!indexingSucceeded) {
-        // If indexing didn't succeed (i.e. an exception was thrown), clean up after ourselves.
+        // If indexing didn't succeed (i.e. an exception was thrown),
+        // clean up after ourselves.
         fs.delete(tmpOutputFile, false);
       } else {
         // Otherwise, rename filename.lzo.index.tmp to filename.lzo.index.

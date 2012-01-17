@@ -62,7 +62,8 @@ public class TestLzoTextInputFormat extends TestCase {
       .getName());
 
   private MessageDigest md5;
-  private final String lzoFileName = "part-r-00001" + new LzopCodec().getDefaultExtension();
+  private final String lzoFileName = "part-r-00001" + 
+    new LzopCodec().getDefaultExtension();
   private Path outputDir;
   
   //test both bigger outputs and small one chunk ones
@@ -73,7 +74,8 @@ public class TestLzoTextInputFormat extends TestCase {
   protected void setUp() throws Exception {
     super.setUp();
     md5 = MessageDigest.getInstance("MD5");
-    Path testBuildData = new Path(System.getProperty("test.build.data", "data"));
+    Path testBuildData = 
+      new Path(System.getProperty("test.build.data", "data"));
     outputDir = new Path(testBuildData, "outputDir");
   }
 
@@ -143,7 +145,8 @@ public class TestLzoTextInputFormat extends TestCase {
    * @throws NoSuchAlgorithmException
    * @throws InterruptedException
    */
-  private void runTest(boolean testWithIndex, int charsToOutput) throws IOException,
+  private void runTest(boolean testWithIndex, 
+		       int charsToOutput) throws IOException,
       NoSuchAlgorithmException, InterruptedException {
 
     if (!GPLNativeCodeLoader.isNativeCodeLoaded()) {
@@ -165,11 +168,13 @@ public class TestLzoTextInputFormat extends TestCase {
     TextOutputFormat.setOutputCompressorClass(job, LzopCodec.class);
     TextOutputFormat.setOutputPath(job, outputDir);
 
-    TaskAttemptContext attemptContext = new TaskAttemptContext(job.getConfiguration(),
-        new TaskAttemptID("123", 0, false, 1, 2));
+    TaskAttemptContext attemptContext = 
+      new TaskAttemptContext(job.getConfiguration(),
+			     new TaskAttemptID("123", 0, false, 1, 2));
 
     // create some input data
-    byte[] expectedMd5 = createTestInput(outputDir, localFs, attemptContext, charsToOutput);
+    byte[] expectedMd5 = createTestInput(outputDir, localFs, attemptContext, 
+					 charsToOutput);
    
     if (testWithIndex) {
       Path lzoFile = new Path(outputDir, lzoFileName);
@@ -215,8 +220,10 @@ public class TestLzoTextInputFormat extends TestCase {
    * @throws IOException
    * @throws InterruptedException
    */
-  private byte[] createTestInput(Path outputDir, FileSystem fs, TaskAttemptContext attemptContext, 
-      int charsToOutput) throws IOException, InterruptedException {
+  private byte[] createTestInput(Path outputDir, FileSystem fs, 
+				 TaskAttemptContext attemptContext, 
+				 int charsToOutput
+				 ) throws IOException, InterruptedException {
 
     TextOutputFormat<Text, Text> output = new TextOutputFormat<Text, Text>();
     RecordWriter<Text, Text> rw = null;
@@ -284,7 +291,10 @@ public class TestLzoTextInputFormat extends TestCase {
   }
 
   private void runTestIgnoreNonLzo(boolean testWithIndex, int charsToOutput,
-    boolean ignoreNonLzo) throws IOException, InterruptedException, NoSuchAlgorithmException {
+				   boolean ignoreNonLzo
+				   ) throws IOException, 
+					    InterruptedException, 
+					    NoSuchAlgorithmException {
     if (!GPLNativeCodeLoader.isNativeCodeLoaded()) {
       LOG.warn("Cannot run this test without the native lzo libraries");
       return;
@@ -312,11 +322,13 @@ public class TestLzoTextInputFormat extends TestCase {
     TextOutputFormat.setOutputCompressorClass(job, LzopCodec.class);
     TextOutputFormat.setOutputPath(job, outputDir);
 
-    TaskAttemptContext attemptContext = new TaskAttemptContext(job.getConfiguration(),
-        new TaskAttemptID("123", 0, false, 1, 2));
+    TaskAttemptContext attemptContext = 
+      new TaskAttemptContext(job.getConfiguration(),
+			     new TaskAttemptID("123", 0, false, 1, 2));
 
     // create some input data
-    byte[] expectedMd5 = createTestInput(outputDir, localFs, attemptContext, charsToOutput);
+    byte[] expectedMd5 = createTestInput(outputDir, localFs, attemptContext, 
+					 charsToOutput);
 
     if (testWithIndex) {
       Path lzoFile = new Path(outputDir, lzoFileName);

@@ -18,6 +18,7 @@
 
 package com.hadoop.mapreduce;
 
+
 import java.io.IOException;
 
 import org.apache.hadoop.conf.Configuration;
@@ -33,6 +34,7 @@ import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 import org.apache.hadoop.util.LineReader;
+
 
 /**
  * Reads line from an lzo compressed text file. Treats keys as offset in file
@@ -73,7 +75,8 @@ public class LzoLineRecordReader extends RecordReader<LongWritable, Text> {
   }
 
   @Override
-  public LongWritable getCurrentKey() throws IOException, InterruptedException {
+  public LongWritable getCurrentKey() throws IOException, 
+                                             InterruptedException {
     return key;
   }
 
@@ -83,18 +86,24 @@ public class LzoLineRecordReader extends RecordReader<LongWritable, Text> {
   }
 
   @Override
-  public void initialize(InputSplit genericSplit, TaskAttemptContext context) throws IOException, InterruptedException {
+  public void initialize(InputSplit genericSplit, 
+			 TaskAttemptContext context
+			 ) throws IOException, InterruptedException {
     FileSplit split = (FileSplit) genericSplit;
+
     start = split.getStart();
     end = start + split.getLength();
     final Path file = split.getPath();
     Configuration job = context.getConfiguration();
 
     FileSystem fs = file.getFileSystem(job);
-    CompressionCodecFactory compressionCodecs = new CompressionCodecFactory(job);
+    CompressionCodecFactory compressionCodecs = 
+      new CompressionCodecFactory(job);
     final CompressionCodec codec = compressionCodecs.getCodec(file);
+
     if (codec == null) {
-      throw new IOException("Codec for file " + file + " not found, cannot run");
+      throw new IOException("Codec for file " + file + 
+			    " not found, cannot run");
     }
 
     // open the file and seek to the start of the split
@@ -116,14 +125,15 @@ public class LzoLineRecordReader extends RecordReader<LongWritable, Text> {
 
   @Override
   public boolean nextKeyValue() throws IOException, InterruptedException {
-    //since the lzop codec reads everything in lzo blocks
-    //we can't stop if the pos == end
-    //instead we wait for the next block to be read in when
-    //pos will be > end
+    // since the lzop codec reads everything in lzo blocks
+    // we can't stop if the pos == end
+    // instead we wait for the next block to be read in when
+    // pos will be > end
     while (pos <= end) {
       key.set(pos);
 
       int newSize = in.readLine(value);
+
       if (newSize == 0) {
         return false;
       }

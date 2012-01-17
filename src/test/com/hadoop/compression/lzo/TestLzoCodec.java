@@ -1,3 +1,20 @@
+/*
+ * This file is part of Hadoop-Gpl-Compression.
+ *
+ * Hadoop-Gpl-Compression is free software: you can redistribute it
+ * and/or modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation, either version 3 of
+ * the License, or (at your option) any later version.
+ *
+ * Hadoop-Gpl-Compression is distributed in the hope that it will be
+ * useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Hadoop-Gpl-Compression.  If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package com.hadoop.compression.lzo;
 
 import junit.framework.TestCase;
@@ -10,8 +27,8 @@ import org.apache.hadoop.conf.Configuration;
 public class TestLzoCodec extends TestCase {
 
   /**
-   * Simple test to make sure reinit can switch the compression strategy of the
-   * same pooled codec instance
+   * Simple test to make sure reinit can switch the compression
+   * strategy of the same pooled codec instance
    **/
   public void testCodecPoolReinit() throws Exception {
     Configuration conf = new Configuration();
@@ -25,7 +42,8 @@ public class TestLzoCodec extends TestCase {
     CodecPool.returnCompressor(c1);
 
     // Set compression strategy
-    LzoCodec.setCompressionStrategy(conf, LzoCompressor.CompressionStrategy.LZO1C_BEST_COMPRESSION);
+    LzoCodec.setCompressionStrategy
+      (conf, LzoCompressor.CompressionStrategy.LZO1C_BEST_COMPRESSION);
 
     Compressor c2 = CodecPool.getCompressor(codec, conf);
     assertSame(c1, c2);
@@ -67,7 +85,8 @@ public class TestLzoCodec extends TestCase {
       LzoCodec.class, conf);
 
     // Set compression strategy
-    LzoCodec.setCompressionStrategy(conf, LzoCompressor.CompressionStrategy.LZO1C_BEST_COMPRESSION);
+    LzoCodec.setCompressionStrategy
+      (conf, LzoCompressor.CompressionStrategy.LZO1C_BEST_COMPRESSION);
 
     // Put a codec in the pool with BEST_COMPRESSION strategy
     Compressor c1 = CodecPool.getCompressor(codec, conf);

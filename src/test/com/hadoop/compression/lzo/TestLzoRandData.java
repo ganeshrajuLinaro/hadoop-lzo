@@ -1,3 +1,20 @@
+/*
+ * This file is part of Hadoop-Gpl-Compression.
+ *
+ * Hadoop-Gpl-Compression is free software: you can redistribute it
+ * and/or modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation, either version 3 of
+ * the License, or (at your option) any later version.
+ *
+ * Hadoop-Gpl-Compression is distributed in the hope that it will be
+ * useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Hadoop-Gpl-Compression.  If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package com.hadoop.compression.lzo;
 
 import java.io.File;
@@ -49,12 +66,14 @@ public class TestLzoRandData extends TestCase {
   }
 
   private void runTest(int numChunks, int chunkSize) throws Exception {
-    CompressionCodec codec = ReflectionUtils.newInstance(LzopCodec.class, conf);
+    CompressionCodec codec = 
+      ReflectionUtils.newInstance(LzopCodec.class, conf);
 
     final Random writerRand = new Random(12345);
     final Random readerRand = new Random(12345);
 
-    File testFile = new File(System.getProperty("test.build.data"), "randdata");
+    File testFile = 
+      new File(System.getProperty("test.build.data"), "randdata");
     String fileName = testFile.getAbsolutePath();
 
     // Create the file
@@ -104,9 +123,11 @@ public class TestLzoRandData extends TestCase {
    * Assert that two arrays are equal.
    */
   private void assertArrayEquals(byte[] expected, byte[] actual) {
-    assertEquals("Array lengths are different", expected.length, actual.length);
+    assertEquals("Array lengths are different", expected.length, 
+		 actual.length);
     for (int i = 0; i < expected.length; i++) {
-      assertEquals("Array elements " + i + " are different", expected[i], actual[i]);
+      assertEquals("Array elements " + i + " are different", expected[i], 
+		   actual[i]);
     }
   }
 

@@ -18,6 +18,7 @@
  
 package com.hadoop.mapreduce;
 
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,6 +44,7 @@ import com.hadoop.compression.lzo.LzoIndex;
 import com.hadoop.compression.lzo.LzoInputFormatCommon;
 import com.hadoop.compression.lzo.LzopCodec;
 
+
 /**
  * An {@link InputFormat} for lzop compressed text files. Files are broken into
  * lines. Either linefeed or carriage-return are used to signal end of line.
@@ -62,7 +64,8 @@ public class LzoTextInputFormat extends TextInputFormat {
     Configuration conf = job.getConfiguration();
     boolean ignoreNonLzo = LzoInputFormatCommon.getIgnoreNonLzoProperty(conf);
 
-    for (Iterator<FileStatus> iterator = files.iterator(); iterator.hasNext();) {
+    for (Iterator<FileStatus> iterator = files.iterator(); 
+	 iterator.hasNext();) {
       FileStatus fileStatus = iterator.next();
       Path file = fileStatus.getPath();
       FileSystem fs = file.getFileSystem(conf);
@@ -72,12 +75,14 @@ public class LzoTextInputFormat extends TextInputFormat {
         // keep them.
         // However, always skip over files that end with ".lzo.index", since
         // they are not part of the input.
-        if (ignoreNonLzo || LzoInputFormatCommon.isLzoIndexFile(file.toString())) {
+        if (ignoreNonLzo || 
+	    LzoInputFormatCommon.isLzoIndexFile(file.toString())) {
           iterator.remove();
         }
       } else {
-        //read the index file
+        // read the index file
         LzoIndex index = LzoIndex.readIndex(fs, file);
+
         indexes.put(file, index);
       }
     }
@@ -89,6 +94,7 @@ public class LzoTextInputFormat extends TextInputFormat {
   protected boolean isSplitable(JobContext context, Path filename) {
     if (LzoInputFormatCommon.isLzoFile(filename.toString())) {
       LzoIndex index = indexes.get(filename);
+
       return !index.isEmpty();
     } else {
       // Delegate non-LZO files to the TextInputFormat base class.
@@ -118,6 +124,7 @@ public class LzoTextInputFormat extends TextInputFormat {
 
       // LZO file, try to split if the .index file was found
       LzoIndex index = indexes.get(file);
+
       if (index == null) {
         throw new IOException("Index not found for " + file);
       }
@@ -132,10 +139,15 @@ public class LzoTextInputFormat extends TextInputFormat {
       long end = start + fileSplit.getLength();
 
       long lzoStart = index.alignSliceStartToIndex(start, end);
-      long lzoEnd = index.alignSliceEndToIndex(end, fs.getFileStatus(file).getLen());
+      long lzoEnd = index.alignSliceEndToIndex(end
+          ,
+          fs.getFileStatus(file).getLen());
 
-      if (lzoStart != LzoIndex.NOT_FOUND  && lzoEnd != LzoIndex.NOT_FOUND) {
-        result.add(new FileSplit(file, lzoStart, lzoEnd - lzoStart, fileSplit.getLocations()));
+      if (lzoStart != LzoIndex.NOT_FOUND && lzoEnd != LzoIndex.NOT_FOUND) {
+        result.add(
+            new FileSplit(file, lzoStart, lzoEnd - lzoStart
+            ,
+            fileSplit.getLocations()));
       }
     }
 
@@ -146,6 +158,7 @@ public class LzoTextInputFormat extends TextInputFormat {
   public RecordReader<LongWritable, Text> createRecordReader(InputSplit split,
       TaskAttemptContext taskAttempt) {
     FileSplit fileSplit = (FileSplit) split;
+
     if (LzoInputFormatCommon.isLzoFile(fileSplit.getPath().toString())) {
       return new LzoLineRecordReader();
     } else {

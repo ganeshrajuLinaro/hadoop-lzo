@@ -18,6 +18,7 @@
 
 package com.hadoop.compression.lzo;
 
+
 import java.io.IOException;
 import java.net.URI;
 import java.text.DecimalFormat;
@@ -28,6 +29,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+
 
 public class LzoIndexer {
   private static final Log LOG = LogFactory.getLog(LzoIndexer.class);
@@ -60,6 +62,7 @@ public class LzoIndexer {
    */
   private String getNesting(int nestingLevel) {
     StringBuffer sb = new StringBuffer();
+
     for (int i = 0; i < nestingLevel; i++) {
       sb.append(INDENT_STRING);
     }
@@ -67,40 +70,54 @@ public class LzoIndexer {
   }
 
   /**
-   * Lzo index a given path, calling recursively to index directories when encountered.
-   * Files are only indexed if they end in .lzo and have no existing .lzo.index file.
+   * Lzo index a given path, calling recursively to index directories
+   * when encountered.  Files are only indexed if they end in .lzo and
+   * have no existing .lzo.index file.
    * 
    * @param lzoPath The base path to index.
    * @param nestingLevel For pretty printing, the nesting level.
    * @throws IOException
    */
-  private void indexInternal(Path lzoPath, int nestingLevel) throws IOException {
+  private void indexInternal(Path lzoPath, 
+			     int nestingLevel) throws IOException {
     FileSystem fs = FileSystem.get(URI.create(lzoPath.toString()), conf_);
     FileStatus fileStatus = fs.getFileStatus(lzoPath);
 
     // Recursively walk
     if (fileStatus.isDir()) {
-      LOG.info(getNesting(nestingLevel) + "LZO Indexing directory " + lzoPath + "...");
+      LOG.info(getNesting(nestingLevel) + "LZO Indexing directory " + 
+	       lzoPath + "...");
       FileStatus[] statuses = fs.listStatus(lzoPath);
+
       for (FileStatus childStatus: statuses) {
         indexInternal(childStatus.getPath(), nestingLevel + 1);
       }
     } else if (lzoPath.toString().endsWith(LZO_EXTENSION)) {
-      Path lzoIndexPath = new Path(lzoPath.toString() + LzoIndex.LZO_INDEX_SUFFIX);
+      Path lzoIndexPath = new Path(
+          lzoPath.toString() + LzoIndex.LZO_INDEX_SUFFIX);
+
       if (fs.exists(lzoIndexPath)) {
-        LOG.info(getNesting(nestingLevel) + "[SKIP] LZO index file already exists for " + lzoPath + "\n");
+        LOG.info(
+            getNesting(nestingLevel) +
+                "[SKIP] LZO index file already exists for " + lzoPath + "\n");
       } else {
         long startTime = System.currentTimeMillis();
         long fileSize = fileStatus.getLen();
 
-        LOG.info(getNesting(nestingLevel) + "[INDEX] LZO Indexing file " + lzoPath + ", size " + 
-                 df_.format(fileSize / (1024.0 * 1024.0 * 1024.0)) + " GB...");
+        LOG.info(
+            getNesting(nestingLevel) + "[INDEX] LZO Indexing file " + lzoPath +
+            ", size " + df_.format(fileSize / (1024.0 * 1024.0 * 1024.0)) +
+            " GB...");
         if (indexSingleFile(fs, lzoPath)) {
           long indexSize = fs.getFileStatus(lzoIndexPath).getLen();
           double elapsed = (System.currentTimeMillis() - startTime) / 1000.0;
-          LOG.info(getNesting(nestingLevel) + "Completed LZO Indexing in " + df_.format(elapsed) + " seconds (" + 
-                   df_.format(fileSize / (1024.0 * 1024.0 * elapsed)) + " MB/s).  Index size is " + 
-                   df_.format(indexSize / 1024.0) + " KB.\n");
+
+          LOG.info(
+              getNesting(nestingLevel) + "Completed LZO Indexing in " +
+              df_.format(elapsed) + " seconds (" +
+              df_.format(fileSize / (1024.0 * 1024.0 * elapsed)) +
+              " MB/s).  Index size is " + df_.format(indexSize / 1024.0) +
+              " KB.\n");
         }
       }
     }
@@ -123,7 +140,8 @@ public class LzoIndexer {
   }
 
   /**
-   * Run the LzoIndexer on each argument passed via stdin.  The files should be HDFS locations.
+   * Run the LzoIndexer on each argument passed via stdin.  The files
+   * should be HDFS locations.
    */
   public static void main(String[] args) {
     if (args.length == 0) {
@@ -132,6 +150,7 @@ public class LzoIndexer {
     }
 
     LzoIndexer lzoIndexer = new LzoIndexer(new Configuration());
+
     for (String arg: args) {
       try {
         lzoIndexer.index(new Path(arg));
@@ -142,6 +161,8 @@ public class LzoIndexer {
   }
 
   public static void printUsage() {
-    System.out.println("Usage: hadoop jar /path/to/this/jar com.hadoop.compression.lzo.LzoIndexer <file.lzo | directory> [file2.lzo directory3 ...]");
+    System.out.println("Usage: hadoop jar /path/to/this/jar " +
+		       "com.hadoop.compression.lzo.LzoIndexer <file.lzo | " +
+		       "directory> [file2.lzo directory3 ...]");
   }
 }

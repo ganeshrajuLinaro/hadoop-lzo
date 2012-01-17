@@ -18,6 +18,7 @@
 
 package com.hadoop.compression.lzo;
 
+
 import java.io.IOException;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
@@ -26,14 +27,15 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.io.compress.Decompressor;
 
+
 /**
  * A {@link Decompressor} based on the lzo algorithm.
  * http://www.oberhumer.com/opensource/lzo/
  * 
  */
 class LzoDecompressor implements Decompressor {
-  private static final Log LOG = 
-    LogFactory.getLog(LzoDecompressor.class.getName());
+  private static final Log LOG = LogFactory.getLog(
+      LzoDecompressor.class.getName());
 
   // HACK - Use this as a global lock in the JNI layer
   @SuppressWarnings({ "unchecked", "unused" })
@@ -61,72 +63,48 @@ class LzoDecompressor implements Decompressor {
 
   private CompressionStrategy strategy;
   @SuppressWarnings("unused")
-  private long lzoDecompressor = 0;   // The actual lzo decompression function.
+  private long lzoDecompressor = 0; // The actual lzo decompression function.
 
   public static enum CompressionStrategy {
+
     /**
      * lzo1 algorithms.
      */
-    LZO1 (0),
-
+    LZO1 (0), 
     /**
      * lzo1a algorithms.
      */
-    LZO1A (1),
-
+    LZO1A (1), 
     /**
      * lzo1b algorithms.
      */
-    LZO1B (2),
-    LZO1B_SAFE(3),
-
+    LZO1B (2), LZO1B_SAFE(3), 
     /**
      * lzo1c algorithms.
      */
-    LZO1C (4),
-    LZO1C_SAFE(5),
-    LZO1C_ASM (6),
-    LZO1C_ASM_SAFE (7),
-
+    LZO1C (4), LZO1C_SAFE(5), LZO1C_ASM (6), LZO1C_ASM_SAFE (7), 
     /**
      * lzo1f algorithms.
      */
-    LZO1F (8),
-    LZO1F_SAFE (9),
-    LZO1F_ASM_FAST (10),
-    LZO1F_ASM_FAST_SAFE (11),
-
+    LZO1F (8), LZO1F_SAFE (9), LZO1F_ASM_FAST (10), LZO1F_ASM_FAST_SAFE (11), 
     /**
      * lzo1x algorithms.
      */
-    LZO1X (12),
-    LZO1X_SAFE (13),
-    LZO1X_ASM (14),
-    LZO1X_ASM_SAFE (15),
-    LZO1X_ASM_FAST (16),
-    LZO1X_ASM_FAST_SAFE (17),
-
+    LZO1X (12), LZO1X_SAFE (13), LZO1X_ASM (14), LZO1X_ASM_SAFE (15), 
+    LZO1X_ASM_FAST (16), LZO1X_ASM_FAST_SAFE (17), 
     /**
      * lzo1y algorithms.
      */
-    LZO1Y (18),
-    LZO1Y_SAFE (19),
-    LZO1Y_ASM (20),
-    LZO1Y_ASM_SAFE (21),
-    LZO1Y_ASM_FAST (22),
-    LZO1Y_ASM_FAST_SAFE (23),
-
+    LZO1Y (18), LZO1Y_SAFE (19), LZO1Y_ASM (20), LZO1Y_ASM_SAFE (21), 
+    LZO1Y_ASM_FAST (22), LZO1Y_ASM_FAST_SAFE (23), 
     /**
      * lzo1z algorithms.
      */
-    LZO1Z (24),
-    LZO1Z_SAFE (25),
-
+    LZO1Z (24), LZO1Z_SAFE (25), 
     /**
      * lzo2a algorithms.
      */
-    LZO2A (26),
-    LZO2A_SAFE (27);
+    LZO2A (26), LZO2A_SAFE (27);
 
     private final int decompressor;
 
@@ -137,7 +115,10 @@ class LzoDecompressor implements Decompressor {
     int getDecompressor() {
       return decompressor;
     }
-  }; // CompressionStrategy
+  }
+
+
+  ; // CompressionStrategy
 
   private static boolean nativeLzoLoaded;
   public static final int LZO_LIBRARY_VERSION;
@@ -153,11 +134,13 @@ class LzoDecompressor implements Decompressor {
         LOG.warn(t.toString());
         nativeLzoLoaded = false;
       }
-      LZO_LIBRARY_VERSION = (nativeLzoLoaded) ? 0xFFFF & getLzoLibraryVersion()
-          : -1;
+      LZO_LIBRARY_VERSION = (nativeLzoLoaded) ?
+          0xFFFF & getLzoLibraryVersion() :
+          -1;
     } else {
-      LOG.error("Cannot load " + LzoDecompressor.class.getName() + 
-      " without native-hadoop library!");
+      LOG.error(
+          "Cannot load " + LzoDecompressor.class.getName() +
+          " without native-hadoop library!");
       nativeLzoLoaded = false;
       LZO_LIBRARY_VERSION = -1;
     }
@@ -197,7 +180,7 @@ class LzoDecompressor implements Decompressor {
    * Creates a new lzo decompressor.
    */
   public LzoDecompressor() {
-    this(CompressionStrategy.LZO1X, 64*1024);
+    this(CompressionStrategy.LZO1X, 64 * 1024);
   }
 
   public synchronized void setInput(byte[] b, int off, int len) {
@@ -227,7 +210,8 @@ class LzoDecompressor implements Decompressor {
       
       // Reinitialize lzo's input direct-buffer
       compressedDirectBuf.rewind();
-      ((ByteBuffer)compressedDirectBuf).put(userBuf, userBufOff, 
+      ((ByteBuffer) compressedDirectBuf).put(userBuf, userBufOff
+          , 
           compressedDirectBufLen);
 
       // Note how much data is being fed to lzo
@@ -270,7 +254,7 @@ class LzoDecompressor implements Decompressor {
   }
 
   public synchronized int decompress(byte[] b, int off, int len) 
-  throws IOException {
+    throws IOException {
     if (b == null) {
       throw new NullPointerException();
     }
@@ -279,6 +263,7 @@ class LzoDecompressor implements Decompressor {
     }
 
     int numBytes = 0;
+
     if (isCurrentBlockUncompressed()) {
       // The current block has been stored uncompressed, so just
       // copy directly from the input buffer.
@@ -291,7 +276,7 @@ class LzoDecompressor implements Decompressor {
       numBytes = uncompressedDirectBuf.remaining();
       if (numBytes > 0) {
         numBytes = Math.min(numBytes, len);
-        ((ByteBuffer)uncompressedDirectBuf).get(b, off, numBytes);
+        ((ByteBuffer) uncompressedDirectBuf).get(b, off, numBytes);
         return numBytes;
       }
 
@@ -307,7 +292,7 @@ class LzoDecompressor implements Decompressor {
 
         // Return atmost 'len' bytes
         numBytes = Math.min(numBytes, len);
-        ((ByteBuffer)uncompressedDirectBuf).get(b, off, numBytes);
+        ((ByteBuffer) uncompressedDirectBuf).get(b, off, numBytes);
       }
     }
 
@@ -327,8 +312,7 @@ class LzoDecompressor implements Decompressor {
     userBufOff = userBufLen = 0;
   }
 
-  public synchronized void end() {
-    // nop
+  public synchronized void end() {// nop
   }
 
   @Override
@@ -360,7 +344,10 @@ class LzoDecompressor implements Decompressor {
   }
 
   private native static void initIDs();
+
   private native static int getLzoLibraryVersion();
+
   private native void init(int decompressor);
+
   private native int decompressBytesDirect(int decompressor);
 }

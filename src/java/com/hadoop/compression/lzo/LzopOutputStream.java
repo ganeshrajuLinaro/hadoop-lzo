@@ -18,6 +18,7 @@
 
 package com.hadoop.compression.lzo;
 
+
 import java.io.DataOutputStream;
 import java.io.FilterOutputStream;
 import java.io.IOException;
@@ -27,6 +28,7 @@ import java.util.zip.Adler32;
 import org.apache.hadoop.io.DataOutputBuffer;
 import org.apache.hadoop.io.compress.CompressorStream;
 import org.apache.hadoop.io.compress.Compressor;
+
 
 public class LzopOutputStream extends CompressorStream {
 
@@ -38,8 +40,9 @@ public class LzopOutputStream extends CompressorStream {
    * Write an lzop-compatible header to the OutputStream provided.
    */
   protected static void writeLzopHeader(OutputStream out,
-          LzoCompressor.CompressionStrategy strategy) throws IOException {
+      LzoCompressor.CompressionStrategy strategy) throws IOException {
     DataOutputBuffer dob = new DataOutputBuffer();
+
     try {
       dob.writeShort(LzopCodec.LZOP_VERSION);
       dob.writeShort(LzoCompressor.LZO_LIBRARY_VERSION);
@@ -49,25 +52,30 @@ public class LzopOutputStream extends CompressorStream {
         dob.writeByte(1);
         dob.writeByte(5);
         break;
+
       case LZO1X_15:
         dob.writeByte(2);
         dob.writeByte(1);
         break;
+
       case LZO1X_999:
         dob.writeByte(3);
         dob.writeByte(9);
         break;
+
       default:
         throw new IOException("Incompatible lzop strategy: " + strategy);
       }
-      dob.writeInt(0);                                    // all flags 0
-      dob.writeInt(0x81A4);                               // mode
-      dob.writeInt((int)(System.currentTimeMillis() / 1000)); // mtime
-      dob.writeInt(0);                                    // gmtdiff ignored
-      dob.writeByte(0);                                   // no filename
+      dob.writeInt(0); // all flags 0
+      dob.writeInt(0x81A4); // mode
+      dob.writeInt((int) (System.currentTimeMillis() / 1000)); // mtime
+      dob.writeInt(0); // gmtdiff ignored
+      dob.writeByte(0); // no filename
       Adler32 headerChecksum = new Adler32();
+
       headerChecksum.update(dob.getData(), 0, dob.getLength());
-      int hc = (int)headerChecksum.getValue();
+      int hc = (int) headerChecksum.getValue();
+
       dob.writeInt(hc);
       out.write(LzopCodec.LZO_MAGIC);
       out.write(dob.getData(), 0, dob.getLength());
@@ -77,21 +85,23 @@ public class LzopOutputStream extends CompressorStream {
   }
 
   public LzopOutputStream(OutputStream out, Compressor compressor,
-          int bufferSize, LzoCompressor.CompressionStrategy strategy)
-  throws IOException {
+      int bufferSize, LzoCompressor.CompressionStrategy strategy)
+    throws IOException {
     this(out, null, compressor, bufferSize, strategy);
   }
 
   public LzopOutputStream(OutputStream out, DataOutputStream indexOut,
       Compressor compressor, int bufferSize,
       LzoCompressor.CompressionStrategy strategy)
-      throws IOException {
+    throws IOException {
     super(new CountingOutputStream(out), compressor, bufferSize);
 
     this.cout = (CountingOutputStream) this.out;
     this.indexOut = indexOut;
     int overhead = strategy.name().contains("LZO1") ?
-      (bufferSize >> 4) + 64 + 3 : (bufferSize >> 3) + 128 + 3;
+        (bufferSize >> 4) + 64 + 3 :
+        (bufferSize >> 3) + 128 + 3;
+
     MAX_INPUT_SIZE = bufferSize - overhead;
 
     writeLzopHeader(this.out, strategy);
@@ -104,7 +114,7 @@ public class LzopOutputStream extends CompressorStream {
   public void close() throws IOException {
     if (!closed) {
       finish();
-      out.write(new byte[]{ 0, 0, 0, 0 });
+      out.write(new byte[] { 0, 0, 0, 0 });
       out.close();
       if (indexOut != null) {
         indexOut.close();
@@ -115,12 +125,13 @@ public class LzopOutputStream extends CompressorStream {
 
   @Override
   public void write(byte[] b, int off, int len) throws IOException {
-    // TODO: LzopOutputStream used to inherit from BlockCompressorStream
-    // but had a bug due to this inheritance chain. In order to fix the
-    // bug we pulled down the implementation of the superclass, which
-    // is overly general. Thus this function is not quite as succint
-    // as it could be, now that it's LZOP-specific.
-    // See: http://github.com/toddlipcon/hadoop-lzo/commit/5fe6dd4736a73fa33b86656ce8aeb011e7f2046c
+    // TODO: LzopOutputStream used to inherit from
+    // BlockCompressorStream but had a bug due to this inheritance
+    // chain. In order to fix the bug we pulled down the
+    // implementation of the superclass, which is overly general. Thus
+    // this function is not quite as succint as it could be, now that
+    // it's LZOP-specific.  See:
+    // http://github.com/toddlipcon/hadoop-lzo/commit/5fe6dd4736a73fa33b86656ce8aeb011e7f2046c
 
     // Sanity checks
     if (compressor.finished()) {
@@ -129,13 +140,14 @@ public class LzopOutputStream extends CompressorStream {
     if (b == null) {
       throw new NullPointerException();
     } else if ((off < 0) || (off > b.length) || (len < 0) ||
-               ((off + len) > b.length)) {
+        ((off + len) > b.length)) {
       throw new IndexOutOfBoundsException();
     } else if (len == 0) {
       return;
     }
 
     long limlen = compressor.getBytesRead();
+
     if (len + limlen > MAX_INPUT_SIZE && limlen > 0) {
       // Adding this segment would exceed the maximum size.
       // Flush data if we have it.
@@ -179,24 +191,29 @@ public class LzopOutputStream extends CompressorStream {
       }
     }
   }
+
   @Override
   protected void compress() throws IOException {
     int len = compressor.compress(buffer, 0, buffer.length);
+
     if (len > 0) {
       // new lzo block. write current position to index file.
       if (indexOut != null) {
         indexOut.writeLong(cout.bytesWritten);
       }
 
-      rawWriteInt((int)compressor.getBytesRead());
+      rawWriteInt((int) compressor.getBytesRead());
 
-      // If the compressed buffer is actually larger than the uncompressed buffer,
-      // the LZO specification says that we should write the uncompressed bytes rather
-      // than the compressed bytes.  The decompressor understands this because both sizes
-      // get written to the stream.
+      // If the compressed buffer is actually larger than the
+      // uncompressed buffer, the LZO specification says that we
+      // should write the uncompressed bytes rather than the
+      // compressed bytes.  The decompressor understands this because
+      // both sizes get written to the stream.
       if (compressor.getBytesRead() <= compressor.getBytesWritten()) {
-        // Compression actually increased the size of the buffer, so write the uncompressed bytes.
-        byte[] uncompressed = ((LzoCompressor)compressor).uncompressedBytes();
+        // Compression actually increased the size of the buffer, so
+        // write the uncompressed bytes.
+        byte[] uncompressed = ((LzoCompressor) compressor).uncompressedBytes();
+
         rawWriteInt(uncompressed.length);
         out.write(uncompressed, 0, uncompressed.length);
       } else {
@@ -210,11 +227,12 @@ public class LzopOutputStream extends CompressorStream {
   private void rawWriteInt(int v) throws IOException {
     out.write((v >>> 24) & 0xFF);
     out.write((v >>> 16) & 0xFF);
-    out.write((v >>>  8) & 0xFF);
-    out.write((v >>>  0) & 0xFF);
+    out.write((v >>> 8) & 0xFF);
+    out.write((v >>> 0) & 0xFF);
   }
 
-  /* keeps count of number of bytes written. */
+  /*
+   * keeps count of number of bytes written. */
   private static class CountingOutputStream extends FilterOutputStream {
     public CountingOutputStream(OutputStream out) {
       super(out);

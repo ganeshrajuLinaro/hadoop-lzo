@@ -18,39 +18,49 @@
 
 package com.hadoop.compression.lzo;
 
+
 import org.apache.hadoop.conf.Configuration;
 
 import com.hadoop.compression.lzo.LzoIndexer;
 import com.hadoop.compression.lzo.LzopCodec;
 
+
 /**
  * Utilities used by the two LzoInputFormat implementations.
  */
 public abstract class LzoInputFormatCommon {
+
   /**
-   * The boolean property <code>lzo.text.input.format.ignore.nonlzo</code> tells
-   * the LZO text input format whether it should silently ignore non-LZO input
-   * files. When the property is true (which is the default), non-LZO files will
-   * be silently ignored. When the property is false, non-LZO files will be
-   * processed using the standard TextInputFormat.
+   * The boolean property
+   * <code>lzo.text.input.format.ignore.nonlzo</code> tells the LZO
+   * text input format whether it should silently ignore non-LZO input
+   * files. When the property is true (which is the default), non-LZO
+   * files will be silently ignored. When the property is false,
+   * non-LZO files will be processed using the standard
+   * TextInputFormat.
    */
-  public static final String IGNORE_NONLZO_KEY = "lzo.text.input.format.ignore.nonlzo";
+  public static final String IGNORE_NONLZO_KEY = 
+    "lzo.text.input.format.ignore.nonlzo";
+
   /**
    * Default value of the <code>lzo.text.input.format.ignore.nonlzo</code>
    * property.
    */
   public static final boolean DEFAULT_IGNORE_NONLZO = true;
+
   /**
    * Full extension for LZO index files (".lzo.index").
    */
-  public static final String FULL_LZO_INDEX_SUFFIX =
+  public static final String FULL_LZO_INDEX_SUFFIX = 
     LzopCodec.DEFAULT_LZO_EXTENSION + LzoIndex.LZO_INDEX_SUFFIX;
 
   /**
    * @param conf the Configuration object
-   * @return the value of the <code>lzo.text.input.format.ignore.nonlzo</code>
-   *         property in <code>conf</code>, or <code>DEFAULT_IGNORE_NONLZO</code>
-   *         if the property is not set.
+   * @return the value of the
+   *         <code>lzo.text.input.format.ignore.nonlzo</code> property
+   *         in <code>conf</code>, or
+   *         <code>DEFAULT_IGNORE_NONLZO</code> if the property is not
+   *         set.
    */
   public static boolean getIgnoreNonLzoProperty(Configuration conf) {
     return conf.getBoolean(IGNORE_NONLZO_KEY, DEFAULT_IGNORE_NONLZO);

@@ -18,6 +18,7 @@
 
 package com.hadoop.mapred;
 
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,25 +44,30 @@ import com.hadoop.compression.lzo.LzoIndex;
 import com.hadoop.compression.lzo.LzoInputFormatCommon;
 import com.hadoop.compression.lzo.LzopCodec;
 
+
 /**
- * This class conforms to the old (org.apache.hadoop.mapred.*) hadoop API style 
- * which is deprecated but still required in places.  Streaming, for example, 
- * does a check that the given input format is a descendant of 
- * org.apache.hadoop.mapred.InputFormat, which any InputFormat-derived class
- * from the new API fails.  In order for streaming to work, you must use
- * com.hadoop.mapred.DeprecatedLzoTextInputFormat, not 
- * com.hadoop.mapreduce.LzoTextInputFormat.  The classes attempt to be alike in
- * every other respect.
- * <p>
- * Note that to use this input format properly with hadoop-streaming, you should
- * also set the property <code>stream.map.input.ignoreKey=true</code>. That will
- * replicate the behavior of the default TextInputFormat by stripping off the byte
- * offset keys from the input lines that get piped to the mapper process.
+ * This class conforms to the old (org.apache.hadoop.mapred.*) hadoop
+ * API style which is deprecated but still required in places.
+ * Streaming, for example, does a check that the given input format is
+ * a descendant of org.apache.hadoop.mapred.InputFormat, which any
+ * InputFormat-derived class from the new API fails.  In order for
+ * streaming to work, you must use
+ * com.hadoop.mapred.DeprecatedLzoTextInputFormat, not
+ * com.hadoop.mapreduce.LzoTextInputFormat.  The classes attempt to be
+ * alike in every other respect.
+ *
+ * <p> Note that to use this input format properly with
+ * hadoop-streaming, you should also set the property
+ * <code>stream.map.input.ignoreKey=true</code>. That will replicate
+ * the behavior of the default TextInputFormat by stripping off the
+ * byte offset keys from the input lines that get piped to the mapper
+ * process.
+ *
  * <p>
  * See {@link LzoInputFormatCommon} for a description of the boolean property
  * <code>lzo.text.input.format.ignore.nonlzo</code> and how it affects the
  * behavior of this input format.
-*/
+ */
 
 @SuppressWarnings("deprecation")
 public class DeprecatedLzoTextInputFormat extends TextInputFormat {
@@ -69,11 +75,13 @@ public class DeprecatedLzoTextInputFormat extends TextInputFormat {
 
   @Override
   protected FileStatus[] listStatus(JobConf conf) throws IOException {
-    List<FileStatus> files = new ArrayList<FileStatus>(Arrays.asList(super.listStatus(conf)));
+    List<FileStatus> files = new ArrayList<FileStatus>(
+        Arrays.asList(super.listStatus(conf)));
 
     boolean ignoreNonLzo = LzoInputFormatCommon.getIgnoreNonLzoProperty(conf);
 
     Iterator<FileStatus> it = files.iterator();
+
     while (it.hasNext()) {
       FileStatus fileStatus = it.next();
       Path file = fileStatus.getPath();
@@ -89,6 +97,7 @@ public class DeprecatedLzoTextInputFormat extends TextInputFormat {
       } else {
         FileSystem fs = file.getFileSystem(conf);
         LzoIndex index = LzoIndex.readIndex(fs, file);
+
         indexes.put(file, index);
       }
     }
@@ -100,6 +109,7 @@ public class DeprecatedLzoTextInputFormat extends TextInputFormat {
   protected boolean isSplitable(FileSystem fs, Path filename) {
     if (LzoInputFormatCommon.isLzoFile(filename.toString())) {
       LzoIndex index = indexes.get(filename);
+
       return !index.isEmpty();
     } else {
       // Delegate non-LZO files to the TextInputFormat base class.
@@ -108,8 +118,9 @@ public class DeprecatedLzoTextInputFormat extends TextInputFormat {
   }
 
   @Override
-  public InputSplit[] getSplits(JobConf conf, int numSplits) throws IOException {
-    FileSplit[] splits = (FileSplit[])super.getSplits(conf, numSplits);
+  public InputSplit[] getSplits(JobConf conf, 
+				int numSplits) throws IOException {
+    FileSplit[] splits = (FileSplit[]) super.getSplits(conf, numSplits);
     // Find new starts/ends of the filesplit that align with the LZO blocks.
 
     List<FileSplit> result = new ArrayList<FileSplit>();
@@ -126,6 +137,7 @@ public class DeprecatedLzoTextInputFormat extends TextInputFormat {
 
       // LZO file, try to split if the .index file was found
       LzoIndex index = indexes.get(file);
+
       if (index == null) {
         throw new IOException("Index not found for " + file);
       }
@@ -139,10 +151,15 @@ public class DeprecatedLzoTextInputFormat extends TextInputFormat {
       long end = start + fileSplit.getLength();
 
       long lzoStart = index.alignSliceStartToIndex(start, end);
-      long lzoEnd = index.alignSliceEndToIndex(end, fs.getFileStatus(file).getLen());
+      long lzoEnd = index.alignSliceEndToIndex(end
+          ,
+          fs.getFileStatus(file).getLen());
 
-      if (lzoStart != LzoIndex.NOT_FOUND  && lzoEnd != LzoIndex.NOT_FOUND) {
-        result.add(new FileSplit(file, lzoStart, lzoEnd - lzoStart, fileSplit.getLocations()));
+      if (lzoStart != LzoIndex.NOT_FOUND && lzoEnd != LzoIndex.NOT_FOUND) {
+        result.add(
+            new FileSplit(file, lzoStart, lzoEnd - lzoStart
+            ,
+            fileSplit.getLocations()));
       }
     }
 
@@ -153,9 +170,10 @@ public class DeprecatedLzoTextInputFormat extends TextInputFormat {
   public RecordReader<LongWritable, Text> getRecordReader(InputSplit split,
       JobConf conf, Reporter reporter) throws IOException {
     FileSplit fileSplit = (FileSplit) split;
+
     if (LzoInputFormatCommon.isLzoFile(fileSplit.getPath().toString())) {
       reporter.setStatus(split.toString());
-      return new DeprecatedLzoLineRecordReader(conf, (FileSplit)split);
+      return new DeprecatedLzoLineRecordReader(conf, (FileSplit) split);
     } else {
       // delegate non-LZO files to the TextInputFormat base class.
       return super.getRecordReader(split, conf, reporter);
