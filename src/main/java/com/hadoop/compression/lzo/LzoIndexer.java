@@ -77,14 +77,14 @@ public class LzoIndexer {
    * @throws IOException
    */
   private void indexInternal(Path lzoPath, 
-			     int nestingLevel) throws IOException {
+                             int nestingLevel) throws IOException {
     FileSystem fs = FileSystem.get(URI.create(lzoPath.toString()), conf_);
     FileStatus fileStatus = fs.getFileStatus(lzoPath);
 
     // Recursively walk
     if (fileStatus.isDir()) {
       LOG.info(getNesting(nestingLevel) + "LZO Indexing directory " + 
-	       lzoPath + "...");
+               lzoPath + "...");
       FileStatus[] statuses = fs.listStatus(lzoPath);
 
       for (FileStatus childStatus: statuses) {
@@ -92,7 +92,7 @@ public class LzoIndexer {
       }
     } else if (lzoPath.toString().endsWith(LZO_EXTENSION)) {
       Path lzoIndexPath = 
-	new Path(lzoPath.toString() + LzoIndex.LZO_INDEX_SUFFIX);
+        new Path(lzoPath.toString() + LzoIndex.LZO_INDEX_SUFFIX);
 
       if (fs.exists(lzoIndexPath)) {
         LOG.info(getNesting(nestingLevel) +
@@ -102,9 +102,9 @@ public class LzoIndexer {
         long fileSize = fileStatus.getLen();
 
         LOG.info(getNesting(nestingLevel) + "[INDEX] LZO Indexing file " + 
-		 lzoPath + ", size " + 
-		 df_.format(fileSize / (1024.0 * 1024.0 * 1024.0)) +
-		 " GB...");
+                 lzoPath + ", size " + 
+                 df_.format(fileSize / (1024.0 * 1024.0 * 1024.0)) +
+                 " GB...");
         if (indexSingleFile(fs, lzoPath)) {
           long indexSize = fs.getFileStatus(lzoIndexPath).getLen();
           double elapsed = (System.currentTimeMillis() - startTime) / 1000.0;
@@ -159,7 +159,7 @@ public class LzoIndexer {
 
   public static void printUsage() {
     System.out.println("Usage: hadoop jar /path/to/this/jar " +
-		       "com.hadoop.compression.lzo.LzoIndexer <file.lzo | " +
-		       "directory> [file2.lzo directory3 ...]");
+                       "com.hadoop.compression.lzo.LzoIndexer <file.lzo | " +
+                       "directory> [file2.lzo directory3 ...]");
   }
 }

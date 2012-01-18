@@ -17,8 +17,9 @@
  */
 package org.anarres.lzo;
 
+
 public interface LzoDecompressor extends LzoTransformer {
 
-    public int decompress(byte[] in, int in_base, int in_len,
-            byte[] out, int out_base, lzo_uintp out_len);
+  public int decompress(byte[] in, int in_base, int in_len,
+      byte[] out, int out_base, lzo_uintp out_len);
 }

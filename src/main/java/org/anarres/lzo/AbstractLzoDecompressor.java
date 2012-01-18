@@ -17,11 +17,12 @@
  */
 package org.anarres.lzo;
 
+
 public abstract class AbstractLzoDecompressor extends AbstractLzoTransformer
-  implements LzoDecompressor {
+    implements LzoDecompressor {
 
   public AbstractLzoDecompressor(LzoAlgorithm algorithm, 
-				 LzoConstraint... constraints) {
+      LzoConstraint... constraints) {
     super(algorithm, constraints);
   }
 }

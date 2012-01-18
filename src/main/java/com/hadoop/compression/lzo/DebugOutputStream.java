@@ -38,7 +38,7 @@ public class DebugOutputStream extends FilterOutputStream {
   @Override
   public void write(byte[] buf, int off, int len) throws IOException {
     System.out.print("Stream " + name + " - " + offset + " write (" +
-		     Integer.toString(len, 16) + ")");
+                     Integer.toString(len, 16) + ")");
     for(int i=0; i < 20 && i < len; ++i) {
       System.out.print(" " + Integer.toString(0xff & buf[off + i], 16));
     }

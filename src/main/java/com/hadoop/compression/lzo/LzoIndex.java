@@ -174,7 +174,7 @@ public class LzoIndex {
    * @throws IOException
    */
   public static LzoIndex readIndex(FileSystem fs, 
-				   Path lzoFile) throws IOException {
+                                   Path lzoFile) throws IOException {
     FSDataInputStream indexIn = null;
     Path indexFile = lzoFile.suffix(LZO_INDEX_SUFFIX);
 
@@ -193,7 +193,7 @@ public class LzoIndex {
     IOUtils.copyBytes(indexIn, bytes, 4 * 1024, true);
 
     ByteBuffer bytesIn = ByteBuffer.wrap(bytes.getData(), 0, 
-					 bytes.getLength());
+                                         bytes.getLength());
     int blocks = bytesIn.remaining() / 8;
     LzoIndex index = new LzoIndex(blocks);
 
@@ -222,9 +222,9 @@ public class LzoIndex {
 
     if (null == codec) {
       throw new IOException("Could not find codec for file " + lzoFile +
-			    " - you may need to add the LZO codec to your " +
-			    "io.compression.codecs configuration in "+
-			    "core-site.xml");
+                            " - you may need to add the LZO codec to your " +
+                            "io.compression.codecs configuration in "+
+                            "core-site.xml");
     }
     ((Configurable) codec).setConf(conf);
 
@@ -244,10 +244,10 @@ public class LzoIndex {
 
       // Solely for reading the header
       LzopInputStream lzopStream = 
-	(LzopInputStream) codec.createInputStream(is);
+        (LzopInputStream) codec.createInputStream(is);
       int numCompressedChecksums = lzopStream.getCompressedChecksumsCount();
       int numDecompressedChecksums = 
-	lzopStream.getDecompressedChecksumsCount();
+        lzopStream.getDecompressedChecksumsCount();
 
       while (true) {
         // read and ignore, we just want to get to the next int

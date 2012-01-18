@@ -18,6 +18,7 @@
 
 package com.hadoop.compression.lzo;
 
+
 import java.io.BufferedWriter;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -36,9 +37,10 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 
+
 /**
- * Test the LzoOutputFormat, make sure that it can write files of different sizes and read them back in
- * identically.
+ * Test the LzoOutputFormat, make sure that it can write files of
+ * different sizes and read them back in identically.
  */
 public class TestLzopOutputStream extends TestCase {
   private static final Log LOG = LogFactory.getLog(TestLzopOutputStream.class);
@@ -60,6 +62,7 @@ public class TestLzopOutputStream extends TestCase {
     outputDataPath = System.getProperty("test.scratch", "test-scratch");
     new File(outputDataPath).mkdirs();
     Configuration conf = new Configuration();
+
     conf.set("io.compression.codecs", LzopCodec.class.getName());
     localFs = FileSystem.getLocal(conf).getRaw();
   }
@@ -68,7 +71,7 @@ public class TestLzopOutputStream extends TestCase {
    * Test against a 100,000 line file with multiple LZO blocks.
    */
   public void testBigFile() throws NoSuchAlgorithmException, IOException,
-  InterruptedException {    
+        InterruptedException {    
     runTest(bigFile);
   }
 
@@ -76,22 +79,29 @@ public class TestLzopOutputStream extends TestCase {
    * Test against a 1,000 line file with a single LZO block.
    */
   public void testMediumFile() throws NoSuchAlgorithmException, IOException,
-  InterruptedException {    
+        InterruptedException {    
     runTest(mediumFile);
   }
 
   /**
-   * Test against a 100 line file that is a single LZO block.  Moreover, this
-   * file compresses to a size larger than its uncompressed size, so the LZO 
-   * format mandates that it's stored differently on disk.  Instead of the usual block
-   * format, which is 
-   * uncompressed size | compressed size | uncompressed checksum | compressed checksum | compressed data
+   * Test against a 100 line file that is a single LZO block.
+   * Moreover, this file compresses to a size larger than its
+   * uncompressed size, so the LZO format mandates that it's stored
+   * differently on disk.  Instead of the usual block format, which is
+   *
+   * uncompressed size | compressed size | uncompressed checksum |
+   *   compressed checksum | compressed data
+   *
    * in this case the block gets stored as
-   * uncompressed size | uncompressed size | uncompressed checksum | uncompressed data
-   * with no additional checksum.  Thus the read has to follow a slightly different codepath.
+   *
+   * uncompressed size | uncompressed size | uncompressed checksum |
+   *   uncompressed data
+   *
+   * with no additional checksum.  Thus the read has to follow a
+   * slightly different codepath.
    */
   public void testSmallFile() throws NoSuchAlgorithmException, IOException,
-  InterruptedException {    
+        InterruptedException {    
     runTest(smallFile);
   }
 
@@ -110,43 +120,54 @@ public class TestLzopOutputStream extends TestCase {
    *
    */
   public void testIssue20File() throws NoSuchAlgorithmException, IOException,
-  InterruptedException {
+        InterruptedException {
     runTest(issue20File);
   }
 
   /**
-   * Test that reading an lzo-compressed file produces the same lines as reading the equivalent
-   * flat file.  The test opens both the compressed and flat file, successively reading each
-   * line by line and comparing.
+   * Test that reading an lzo-compressed file produces the same lines
+   * as reading the equivalent flat file.  The test opens both the
+   * compressed and flat file, successively reading each line by line
+   * and comparing.
    */
   private void runTest(String filename) throws IOException,
-  NoSuchAlgorithmException, InterruptedException {
+        NoSuchAlgorithmException, InterruptedException {
 
-    // Assumes the flat file is at filename, and the compressed version is filename.lzo
+    // Assumes the flat file is at filename, and the compressed
+    // version is filename.lzo
     File textFile = new File(inputDataPath, filename);
-    File lzoOutFile = new File(outputDataPath, "output_" + filename + new LzopCodec().getDefaultExtension());
+    File lzoOutFile = new File(outputDataPath
+        ,
+        "output_" + filename + new LzopCodec().getDefaultExtension());
+
     if (lzoOutFile.exists()) {
       lzoOutFile.delete();
     }
     LOG.info("Creating " + lzoOutFile);
 
     //
-    // First, read in the text file, and write each line to an lzop output stream.
+    // First, read in the text file, and write each line to an lzop
+    // output stream.
     //
     
     // Set up the text file reader.
-    BufferedReader textBr = new BufferedReader(new InputStreamReader(new FileInputStream(textFile.getAbsolutePath())));
+    BufferedReader textBr = new BufferedReader(
+        new InputStreamReader(new FileInputStream
+                              (textFile.getAbsolutePath())));
     // Set up the LZO writer..
     int lzoBufferSize = 256 * 1024;
-    LzoCompressor.CompressionStrategy strategy = LzoCompressor.CompressionStrategy.LZO1X_1;
-    LzopOutputStream lzoOut = new LzopOutputStream(new FileOutputStream(lzoOutFile),
-						   strategy, lzoBufferSize);
+    LzoCompressor.CompressionStrategy strategy = 
+      LzoCompressor.CompressionStrategy.LZO1X_1;
+    LzopOutputStream lzoOut = new LzopOutputStream(
+        new FileOutputStream(lzoOutFile), strategy, lzoBufferSize);
 
     // Now read line by line and stream out..
     String textLine;
+
     while ((textLine = textBr.readLine()) != null) {
       textLine += "\n";
       byte[] bytes = textLine.getBytes();
+
       lzoOut.write(bytes, 0, bytes.length);
     }
     textBr.close();
@@ -159,22 +180,29 @@ public class TestLzopOutputStream extends TestCase {
     LOG.info("Comparing files " + textFile + " and " + lzoOutFile);
     
     // Set up the text file reader.
-    BufferedReader textBr2 = new BufferedReader(new InputStreamReader(new FileInputStream(textFile.getAbsolutePath())));
+    BufferedReader textBr2 = new BufferedReader(
+        new InputStreamReader(new FileInputStream
+                              (textFile.getAbsolutePath())));
     // Set up the LZO reader.
-    LzopInputStream lzoIn = new LzopInputStream(new FileInputStream(lzoOutFile.getAbsolutePath()));
+    LzopInputStream lzoIn = new LzopInputStream(
+        new FileInputStream(lzoOutFile.getAbsolutePath()));
     BufferedReader lzoBr = new BufferedReader(new InputStreamReader(lzoIn));
 
     // Now read line by line and compare.
     String textLine2;
     String lzoLine;
     int line = 0;
+
     while ((textLine2 = textBr2.readLine()) != null) {
       line++;
       lzoLine = lzoBr.readLine();
       if (!lzoLine.equals(textLine2)) {
-        LOG.error("LZO decoding mismatch on line " + line + " of file " + filename);
-        LOG.error("Text line: [" + textLine2 + "], which has length " + textLine2.length());
-        LOG.error("LZO line: [" + lzoLine + "], which has length " + lzoLine.length());
+        LOG.error("LZO decoding mismatch on line " + line + " of file " + 
+                  filename);
+        LOG.error("Text line: [" + textLine2 + "], which has length " +
+                  textLine2.length());
+        LOG.error("LZO line: [" + lzoLine + "], which has length " +
+                  lzoLine.length());
       }
       assertEquals(lzoLine, textLine2);
     }

@@ -34,13 +34,13 @@ public class LzoIndexOutputFormat extends OutputFormat<Path, LongWritable> {
   @Override
   public RecordWriter<Path, LongWritable> 
      getRecordWriter(TaskAttemptContext taskAttemptContext
-		     ) throws IOException, InterruptedException {
+                     ) throws IOException, InterruptedException {
     return new LzoIndexRecordWriter(taskAttemptContext);
   }
 
   @Override
   public void checkOutputSpecs(JobContext job
-			       ) throws FileAlreadyExistsException, 
+                               ) throws FileAlreadyExistsException, 
                                         IOException {
   }
 
@@ -50,7 +50,7 @@ public class LzoIndexOutputFormat extends OutputFormat<Path, LongWritable> {
   @Override
   public OutputCommitter 
       getOutputCommitter(TaskAttemptContext taskAttemptContext
-			 ) throws IOException, InterruptedException {
+                         ) throws IOException, InterruptedException {
     return new OutputCommitter() {
       @Override public void setupJob(JobContext jobContext) {}
 

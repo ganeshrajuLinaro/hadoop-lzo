@@ -1,3 +1,20 @@
+/*
+ * This file is part of Hadoop-Gpl-Compression.
+ *
+ * Hadoop-Gpl-Compression is free software: you can redistribute it
+ * and/or modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation, either version 3 of
+ * the License, or (at your option) any later version.
+ *
+ * Hadoop-Gpl-Compression is distributed in the hope that it will be
+ * useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Hadoop-Gpl-Compression.  If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package com.hadoop.compression.lzo;
 
 import java.io.IOException;
@@ -8,12 +25,12 @@ import org.apache.hadoop.io.compress.CompressionOutputStream;
 public class LzopOutputStream extends CompressionOutputStream {
 
   public LzopOutputStream(OutputStream out, 
-			  LzoCompressor.CompressionStrategy strategy, 
-			  int bufferSize) throws IOException {
+                          LzoCompressor.CompressionStrategy strategy, 
+                          int bufferSize) throws IOException {
     super(new org.anarres.lzo.LzopOutputStream(out, strategy.newCompressor(),
-					       bufferSize, 
-					       LzopConstants.F_ADLER32_C | 
-					       LzopConstants.F_ADLER32_D));
+                                               bufferSize, 
+                                               LzopConstants.F_ADLER32_C | 
+                                               LzopConstants.F_ADLER32_D));
   }
 
   @Override

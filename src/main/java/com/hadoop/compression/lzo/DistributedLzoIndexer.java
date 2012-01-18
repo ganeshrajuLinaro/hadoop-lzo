@@ -56,7 +56,7 @@ public class DistributedLzoIndexer extends Configured implements Tool {
   };
 
   private void walkPath(Path path, PathFilter pathFilter, 
-			List<Path> accumulator) {
+                        List<Path> accumulator) {
     try {
       FileSystem fs = path.getFileSystem(getConf());
       FileStatus fileStatus = fs.getFileStatus(path);
@@ -127,7 +127,7 @@ public class DistributedLzoIndexer extends Configured implements Tool {
     // The LzoIndexOutputFormat doesn't currently work with
     // speculative execution.  Patches welcome.
     job.getConfiguration().setBoolean("mapred.map.tasks.speculative.execution",
-				      false);
+                                      false);
 
     job.setJarByClass(DistributedLzoIndexer.class);
     job.setInputFormatClass(LzoSplitInputFormat.class);
@@ -150,7 +150,7 @@ public class DistributedLzoIndexer extends Configured implements Tool {
 
   public static void printUsage() {
     System.err.println("Usage: hadoop jar /path/to/this/jar " + 
-		       "com.hadoop.compression.lzo.DistributedLzoIndexer " + 
-		       "<file.lzo | directory> [file2.lzo directory3 ...]");
+                       "com.hadoop.compression.lzo.DistributedLzoIndexer " + 
+                       "<file.lzo | directory> [file2.lzo directory3 ...]");
   }
 }

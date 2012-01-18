@@ -17,7 +17,8 @@
  */
 package org.anarres.lzo;
 
+
 public enum LzoConstraint {
 
-    SPEED, MEMORY, COMPRESSION, SAFETY;
+  SPEED, MEMORY, COMPRESSION, SAFETY;
 }

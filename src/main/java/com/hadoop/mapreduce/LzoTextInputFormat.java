@@ -65,7 +65,7 @@ public class LzoTextInputFormat extends TextInputFormat {
     boolean ignoreNonLzo = LzoInputFormatCommon.getIgnoreNonLzoProperty(conf);
 
     for (Iterator<FileStatus> iterator = files.iterator(); 
-	 iterator.hasNext();) {
+         iterator.hasNext();) {
       FileStatus fileStatus = iterator.next();
       Path file = fileStatus.getPath();
       FileSystem fs = file.getFileSystem(conf);
@@ -76,7 +76,7 @@ public class LzoTextInputFormat extends TextInputFormat {
         // However, always skip over files that end with ".lzo.index", since
         // they are not part of the input.
         if (ignoreNonLzo || 
-	    LzoInputFormatCommon.isLzoIndexFile(file.toString())) {
+            LzoInputFormatCommon.isLzoIndexFile(file.toString())) {
           iterator.remove();
         }
       } else {

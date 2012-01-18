@@ -47,7 +47,7 @@ public class LzoIndexRecordWriter extends RecordWriter<Path, LongWritable> {
 
   @Override
   public void write(Path path, LongWritable offset
-		    ) throws IOException, InterruptedException {
+                    ) throws IOException, InterruptedException {
     if (outputStream == null) {
       // Set up the output file on the first record.
       LOG.info("Setting up output stream to write index file for " + path);
@@ -58,13 +58,13 @@ public class LzoIndexRecordWriter extends RecordWriter<Path, LongWritable> {
 
   @Override
   public void close(TaskAttemptContext taskAttemptContext
-		    ) throws IOException, InterruptedException {
+                    ) throws IOException, InterruptedException {
     if (outputStream != null) {
       // Close the output stream so that the tmp file is synced, then move it.
       outputStream.close();
 
       LOG.info("In close, now renaming " + tmpIndexPath + 
-	       " to final location " + realIndexPath);
+               " to final location " + realIndexPath);
       // Rename, indexing completed.
       fs.rename(tmpIndexPath, realIndexPath);
     }

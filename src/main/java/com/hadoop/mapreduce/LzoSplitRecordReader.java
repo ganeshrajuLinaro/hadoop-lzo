@@ -56,8 +56,8 @@ public class LzoSplitRecordReader extends RecordReader<Path, LongWritable> {
 
   @Override
   public void initialize(InputSplit genericSplit, 
-			 TaskAttemptContext taskAttemptContext
-			 ) throws IOException {
+                         TaskAttemptContext taskAttemptContext
+                         ) throws IOException {
     context = taskAttemptContext;
     FileSplit fileSplit = (FileSplit) genericSplit;
 
@@ -129,8 +129,8 @@ public class LzoSplitRecordReader extends RecordReader<Path, LongWritable> {
     // Log some progress every so often.
     if (numBlocksRead % LOG_EVERY_N_BLOCKS == 0) {
       LOG.info("Reading block " + numBlocksRead + " at pos " + pos + " of " +
-	       totalFileSize + ". Read is " + (100.0 * getProgress()) + 
-	       "% done. ");
+               totalFileSize + ". Read is " + (100.0 * getProgress()) + 
+               "% done. ");
     }
 
     return true;
@@ -158,7 +158,7 @@ public class LzoSplitRecordReader extends RecordReader<Path, LongWritable> {
   @Override
   public void close() throws IOException {
     LOG.info("Closing input stream after reading " + numBlocksRead + 
-	     " blocks from " + lzoFile);
+             " blocks from " + lzoFile);
     rawInputStream.close();
   }
 }

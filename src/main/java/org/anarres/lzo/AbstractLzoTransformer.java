@@ -17,50 +17,60 @@
  */
 package org.anarres.lzo;
 
+
 public class AbstractLzoTransformer implements LzoTransformer {
 
-    private final LzoAlgorithm algorithm;
-    private final LzoConstraint[] constraints;
+  private final LzoAlgorithm algorithm;
+  private final LzoConstraint[] constraints;
 
-    public AbstractLzoTransformer(LzoAlgorithm algorithm, 
-				  LzoConstraint... constraints) {
-        this.algorithm = algorithm;
-        this.constraints = constraints;
-    }
+  public AbstractLzoTransformer(LzoAlgorithm algorithm, 
+      LzoConstraint... constraints) {
+    this.algorithm = algorithm;
+    this.constraints = constraints;
+  }
 
-    @Override
-    public LzoAlgorithm getAlgorithm() {
-        return algorithm;
-    }
+  @Override
+  public LzoAlgorithm getAlgorithm() {
+    return algorithm;
+  }
 
-    @Override
-    public LzoConstraint[] getConstraints() {
-        return constraints;
-    }
+  @Override
+  public LzoConstraint[] getConstraints() {
+    return constraints;
+  }
 
-    @Override
-    public String toErrorString(int code) {
-        switch (code) {
-            case LZO_E_OK:
-                return "OK";
-            case LZO_E_ERROR:
-                return "Error";
-            case LZO_E_OUT_OF_MEMORY:
-                return "Out of memory";
-            case LZO_E_NOT_COMPRESSIBLE:
-                return "Not compressible";
-            case LZO_E_INPUT_OVERRUN:
-                return "Input overrun";
-            case LZO_E_OUTPUT_OVERRUN:
-                return "Output overrun";
-            case LZO_E_LOOKBEHIND_OVERRUN:
-                return "Lookbehind overrun";
-            case LZO_E_EOF_NOT_FOUND:
-                return "EOF not found";
-            case LZO_E_INPUT_NOT_CONSUMED:
-                return "Input not consumed";
-            default:
-                return "Unknown-" + code;
-        }
+  @Override
+  public String toErrorString(int code) {
+    switch (code) {
+    case LZO_E_OK:
+      return "OK";
+
+    case LZO_E_ERROR:
+      return "Error";
+
+    case LZO_E_OUT_OF_MEMORY:
+      return "Out of memory";
+
+    case LZO_E_NOT_COMPRESSIBLE:
+      return "Not compressible";
+
+    case LZO_E_INPUT_OVERRUN:
+      return "Input overrun";
+
+    case LZO_E_OUTPUT_OVERRUN:
+      return "Output overrun";
+
+    case LZO_E_LOOKBEHIND_OVERRUN:
+      return "Lookbehind overrun";
+
+    case LZO_E_EOF_NOT_FOUND:
+      return "EOF not found";
+
+    case LZO_E_INPUT_NOT_CONSUMED:
+      return "Input not consumed";
+
+    default:
+      return "Unknown-" + code;
     }
+  }
 }

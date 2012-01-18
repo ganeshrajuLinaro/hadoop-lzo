@@ -17,6 +17,7 @@
  */
 package org.anarres.lzo;
 
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -32,64 +33,72 @@ import org.apache.hadoop.io.compress.BlockCompressorStream;
 import org.apache.hadoop.io.compress.BlockDecompressorStream;
 import org.junit.Test;
 
-/**
- *
- * @author shevek
- */
+
 public class BlockCompressorStreamTest {
 
-    private static final Log LOG = LogFactory.getLog(BlockCompressorStreamTest.class);
-    private static final String PATH = "src/main/jcpp/src/miniacc.h";
-    private static final String TEST_SCRATCH = "target/test-scratch";
-    private static final String OUT_PATH = TEST_SCRATCH + "/compressed.out";
-    static {
-      new File(TEST_SCRATCH).mkdirs();
+  private static final Log LOG = LogFactory.getLog(
+      BlockCompressorStreamTest.class);
+  private static final String PATH = "src/main/jcpp/src/miniacc.h";
+  private static final String TEST_SCRATCH = "target/test-scratch";
+  private static final String OUT_PATH = TEST_SCRATCH + "/compressed.out";
+  static {
+    new File(TEST_SCRATCH).mkdirs();
+  }
+
+  @Test
+  public void testBlockCompressorStream() throws Throwable {
+    try {
+      LOG.info("Total memory is " + Runtime.getRuntime().totalMemory());
+      LOG.info("Max memory is " + Runtime.getRuntime().maxMemory());
+
+      FileInputStream fi = new FileInputStream(new File(PATH));
+      DataInputStream di = new DataInputStream(fi);
+      int len = (int) new File(PATH).length();
+      byte[] data = new byte[len];
+
+      di.readFully(data);
+      LOG.info("Original data is " + data.length + " bytes.");
+
+      for (int i = 0; i < 1; i++) {
+        ByteArrayInputStream bi = new ByteArrayInputStream(data);
+        ByteArrayOutputStream bo = new ByteArrayOutputStream(data.length);
+        BlockCompressorStream co = new BlockCompressorStream(bo
+            ,
+            new LzoCompressor(), 64 * 1024, 18);
+
+        LOG.info("Starting.");
+        long start = System.currentTimeMillis();
+
+        IOUtils.copy(bi, co);
+        co.close();
+        long end = System.currentTimeMillis();
+
+        LOG.info("Compression took " + ((end - start) / 1000d) + " ms");
+        LOG.info("Compressed data is " + bo.size() + " bytes.");
+
+        byte[] cb = bo.toByteArray();
+
+        FileUtils.writeByteArrayToFile(new File(OUT_PATH), cb);
+
+        bi = new ByteArrayInputStream(cb);
+        BlockDecompressorStream ci = new BlockDecompressorStream(bi
+            ,
+            new LzoDecompressor());
+
+        bo.reset();
+        start = System.currentTimeMillis();
+        IOUtils.copy(ci, bo);
+        end = System.currentTimeMillis();
+        LOG.info("Uncompression took " + ((end - start) / 1000d) + " ms");
+        LOG.info("Uncompressed data is " + bo.size() + " bytes.");
+      }
+    } catch (Throwable t) {
+      LOG.error(t, t);
+      throw t;
+    } finally {
+      System.out.flush();
+      System.err.flush();
+      Thread.sleep(100);
     }
-
-    @Test
-    public void testBlockCompressorStream() throws Throwable {
-        try {
-            LOG.info("Total memory is " + Runtime.getRuntime().totalMemory());
-            LOG.info("Max memory is " + Runtime.getRuntime().maxMemory());
-
-            FileInputStream fi = new FileInputStream(new File(PATH));
-            DataInputStream di = new DataInputStream(fi);
-            int len = (int) new File(PATH).length();
-            byte[] data = new byte[len];
-            di.readFully(data);
-            LOG.info("Original data is " + data.length + " bytes.");
-
-            for (int i = 0; i < 1; i++) {
-                ByteArrayInputStream bi = new ByteArrayInputStream(data);
-                ByteArrayOutputStream bo = new ByteArrayOutputStream(data.length);
-                BlockCompressorStream co = new BlockCompressorStream(bo, new LzoCompressor(), 64 * 1024, 18);
-                LOG.info("Starting.");
-                long start = System.currentTimeMillis();
-                IOUtils.copy(bi, co);
-                co.close();
-                long end = System.currentTimeMillis();
-                LOG.info("Compression took " + ((end - start) / 1000d) + " ms");
-                LOG.info("Compressed data is " + bo.size() + " bytes.");
-
-                byte[] cb = bo.toByteArray();
-                FileUtils.writeByteArrayToFile(new File(OUT_PATH), cb);
-
-                bi = new ByteArrayInputStream(cb);
-                BlockDecompressorStream ci = new BlockDecompressorStream(bi, new LzoDecompressor());
-                bo.reset();
-                start = System.currentTimeMillis();
-                IOUtils.copy(ci, bo);
-                end = System.currentTimeMillis();
-                LOG.info("Uncompression took " + ((end - start) / 1000d) + " ms");
-                LOG.info("Uncompressed data is " + bo.size() + " bytes.");
-            }
-        } catch (Throwable t) {
-            LOG.error(t, t);
-            throw t;
-        } finally {
-            System.out.flush();
-            System.err.flush();
-            Thread.sleep(100);
-        }
-    }
+  }
 }

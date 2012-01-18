@@ -34,8 +34,8 @@ public class LzoSplitInputFormat extends FileInputFormat<Path, LongWritable> {
   @Override
   public RecordReader<Path, LongWritable> 
     createRecordReader(InputSplit inputSplit,
-		       TaskAttemptContext taskAttemptContext
-		       ) throws IOException, InterruptedException {
+                       TaskAttemptContext taskAttemptContext
+                       ) throws IOException, InterruptedException {
     return new LzoSplitRecordReader();
   }
 

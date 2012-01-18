@@ -18,6 +18,7 @@
 
 package com.hadoop.compression.lzo;
 
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -33,6 +34,7 @@ import org.apache.hadoop.io.compress.CompressionCodec;
 import org.apache.hadoop.util.ReflectionUtils;
 
 import com.hadoop.compression.lzo.LzopCodec;
+
 
 /**
  * Unit Test for LZO with random data.
@@ -67,22 +69,26 @@ public class TestLzoRandData extends TestCase {
   }
 
   private void runTest(int numChunks, int chunkSize) throws Exception {
-    CompressionCodec codec = ReflectionUtils.newInstance(LzopCodec.class, conf);
+    CompressionCodec codec = 
+      ReflectionUtils.newInstance(LzopCodec.class, conf);
 
     final Random writerRand = new Random(12345);
     final Random readerRand = new Random(12345);
 
     File outDir = new File(System.getProperty("test.scratch"));
+
     outDir.mkdirs();
     File testFile = new File(outDir, "randdata");
     String fileName = testFile.getAbsolutePath();
 
     // Create the file
     OutputStream fos = new FileOutputStream(fileName);
+
     fos = codec.createOutputStream(fos);
 
     // Write file
     byte[] data = new byte[chunkSize];
+
     for (int i = 0; i < numChunks; i++) {
       writerRand.nextBytes(data);
       fos.write(data);
@@ -91,11 +97,13 @@ public class TestLzoRandData extends TestCase {
 
     // Open file
     InputStream tis = new FileInputStream(fileName);
+
     tis = codec.createInputStream(tis);
 
     // Read file
     byte[] dataExpected = new byte[chunkSize];
     byte[] dataRead = new byte[chunkSize];
+
     for (int i = 0; i < numChunks; i++) {
       readerRand.nextBytes(dataExpected);
       readFully(tis, dataRead);
@@ -106,11 +114,12 @@ public class TestLzoRandData extends TestCase {
     tis.close();
   }
 
-
   private void readFully(InputStream in, byte[] b) throws IOException {
     int pos = 0;
+
     do {
       int len = in.read(b, pos, b.length - pos);
+
       if (len < 0) {
         fail("Unexpected end of file.");
       }
@@ -122,9 +131,12 @@ public class TestLzoRandData extends TestCase {
    * Assert that two arrays are equal.
    */
   private void assertArrayEquals(byte[] expected, byte[] actual) {
-    assertEquals("Array lengths are different", expected.length, actual.length);
+    assertEquals("Array lengths are different", 
+                 expected.length, actual.length);
     for (int i = 0; i < expected.length; i++) {
-      assertEquals("Array elements " + i + " are different", expected[i], actual[i]);
+      assertEquals("Array elements " + i + " are different", expected[i]
+          ,
+          actual[i]);
     }
   }
 

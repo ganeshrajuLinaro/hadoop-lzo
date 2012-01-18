@@ -45,7 +45,7 @@ public class DeprecatedLzoLineRecordReader
   private final FSDataInputStream fileIn;
 
   DeprecatedLzoLineRecordReader(Configuration conf, 
-				FileSplit split) throws IOException {
+                                FileSplit split) throws IOException {
     start = split.getStart();
     end = start + split.getLength();
     final Path file = split.getPath();

@@ -92,7 +92,7 @@ public class DeprecatedLzoTextInputFormat extends TextInputFormat {
         // However, always skip over files that end with ".lzo.index", since
         // they are not part of the input.
         if (ignoreNonLzo || 
-	    LzoInputFormatCommon.isLzoIndexFile(file.toString())) {
+            LzoInputFormatCommon.isLzoIndexFile(file.toString())) {
           it.remove();
         }
       } else {
@@ -120,7 +120,7 @@ public class DeprecatedLzoTextInputFormat extends TextInputFormat {
 
   @Override
   public InputSplit[] getSplits(JobConf conf, 
-				int numSplits) throws IOException {
+                                int numSplits) throws IOException {
     FileSplit[] splits = (FileSplit[]) super.getSplits(conf, numSplits);
     // Find new starts/ends of the filesplit that align with the LZO blocks.
 
@@ -158,7 +158,7 @@ public class DeprecatedLzoTextInputFormat extends TextInputFormat {
 
       if (lzoStart != LzoIndex.NOT_FOUND && lzoEnd != LzoIndex.NOT_FOUND) {
         result.add(new FileSplit(file, lzoStart, lzoEnd - lzoStart,
-				 fileSplit.getLocations()));
+                                 fileSplit.getLocations()));
       }
     }
 

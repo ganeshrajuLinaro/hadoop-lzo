@@ -55,9 +55,8 @@ public class LzoCodec extends com.hadoop.compression.lzo.LzoCodec {
   public CompressionOutputStream createOutputStream(OutputStream out,
       Compressor compressor) throws IOException {
     if (!warned) {
-      LOG.warn(
-          oahLzoCodec + " is deprecated. You should use " + chclLzoCodec +
-          " instead to generate LZO compressed data.");
+      LOG.warn(oahLzoCodec + " is deprecated. You should use " + chclLzoCodec +
+               " instead to generate LZO compressed data.");
       warned = true;
     }
     return super.createOutputStream(out, compressor);

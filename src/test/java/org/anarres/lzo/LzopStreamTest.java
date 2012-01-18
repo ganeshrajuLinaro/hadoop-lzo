@@ -18,6 +18,7 @@
 
 package org.anarres.lzo;
 
+
 import java.io.File;
 import org.junit.Ignore;
 import java.io.ByteArrayInputStream;
@@ -35,128 +36,113 @@ import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-/**
- *
- * @author shevek
- */
+
 public class LzopStreamTest {
 
-    private static final Log LOG = LogFactory.getLog(LzopStreamTest.class);
-    private static final String TEST_SCRATCH = "target/test-scratch";
-    private static final String OUT_PATH = TEST_SCRATCH + "/temp.lzo";
-    static {
-      new File(TEST_SCRATCH).mkdirs();
+  private static final Log LOG = LogFactory.getLog(LzopStreamTest.class);
+  private static final String TEST_SCRATCH = "target/test-scratch";
+  private static final String OUT_PATH = TEST_SCRATCH + "/temp.lzo";
+  static {
+    new File(TEST_SCRATCH).mkdirs();
+  }
+  private static long[] FLAGS = new long[] {
+    0L, // Adler32
+    LzopConstants.F_ADLER32_C, LzopConstants.F_ADLER32_D
+        ,
+    LzopConstants.F_ADLER32_C | LzopConstants.F_ADLER32_D, // CRC32
+    LzopConstants.F_CRC32_C, LzopConstants.F_CRC32_D
+        ,
+    LzopConstants.F_CRC32_C | LzopConstants.F_CRC32_D, // Both
+    LzopConstants.F_ADLER32_C | LzopConstants.F_CRC32_C
+        ,
+    LzopConstants.F_ADLER32_D | LzopConstants.F_CRC32_D
+        ,
+    LzopConstants.F_ADLER32_C | LzopConstants.F_ADLER32_D |
+        LzopConstants.F_CRC32_C | LzopConstants.F_CRC32_D
+  };
+
+  public void testAlgorithm(LzoAlgorithm algorithm, 
+                            byte[] orig) throws IOException {
+    for (long flags : FLAGS) {
+      try {
+        LzoCompressor compressor = LzoLibrary.getInstance().newCompressor(
+            algorithm, null);
+
+        LOG.info("Compressing " + orig.length + " bytes using " + algorithm);
+
+        // LOG.info("Original:   " + Arrays.toString(orig));
+
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        LzopOutputStream cs = new LzopOutputStream(os, compressor, 256, flags);
+
+        cs.write(orig);
+        cs.close();
+
+        FileUtils.writeByteArrayToFile(new File(OUT_PATH), os.toByteArray());
+
+        ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
+        LzopInputStream us = new LzopInputStream(is);
+        DataInputStream ds = new DataInputStream(us);
+        byte[] uncompressed = new byte[orig.length];
+
+        ds.readFully(uncompressed);
+
+        assertArrayEquals(orig, uncompressed);
+      } finally {
+        System.out.flush();
+        System.err.flush();
+      }
     }
-    private static long[] FLAGS = new long[]{
-        0L,
-        // Adler32
-        LzopConstants.F_ADLER32_C,
-        LzopConstants.F_ADLER32_D,
-        LzopConstants.F_ADLER32_C | LzopConstants.F_ADLER32_D,
-        // CRC32
-        LzopConstants.F_CRC32_C,
-        LzopConstants.F_CRC32_D,
-        LzopConstants.F_CRC32_C | LzopConstants.F_CRC32_D,
-        // Both
-        LzopConstants.F_ADLER32_C | LzopConstants.F_CRC32_C,
-        LzopConstants.F_ADLER32_D | LzopConstants.F_CRC32_D,
-        LzopConstants.F_ADLER32_C | LzopConstants.F_ADLER32_D | LzopConstants.F_CRC32_C | LzopConstants.F_CRC32_D
-    };
+  }
 
-    public void testAlgorithm(LzoAlgorithm algorithm, byte[] orig) throws IOException {
-        for (long flags : FLAGS) {
-            try {
-                LzoCompressor compressor = LzoLibrary.getInstance().newCompressor(algorithm, null);
-                LOG.info("Compressing " + orig.length + " bytes using " + algorithm);
+  // Totally RLE.
+  @Test
+  public void testBlank() throws Exception {
+    byte[] orig = new byte[512 * 1024];
 
-                // LOG.info("Original:   " + Arrays.toString(orig));
+    Arrays.fill(orig, (byte) 0);
+    testAlgorithm(LzoAlgorithm.LZO1X, orig);
+  }
 
-                ByteArrayOutputStream os = new ByteArrayOutputStream();
-                LzopOutputStream cs = new LzopOutputStream(os, compressor, 256, flags);
-                cs.write(orig);
-                cs.close();
+  // Highly cyclic.
+  @Test
+  public void testSequence() throws Exception {
+    byte[] orig = new byte[512 * 1024];
 
-                // LOG.info("Compressed: OK.");
-
-                FileUtils.writeByteArrayToFile(new File(OUT_PATH), 
-                                               os.toByteArray());
-
-                // LzoDecompressor decompressor = LzoLibrary.getInstance().newDecompressor(algorithm, null);
-
-                ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
-                LzopInputStream us = new LzopInputStream(is);
-                DataInputStream ds = new DataInputStream(us);
-                byte[] uncompressed = new byte[orig.length];
-                ds.readFully(uncompressed);
-
-                // LOG.info("Output:     OK.");
-                // LOG.info("Output:     " + Arrays.toString(uncompressed));
-
-                assertArrayEquals(orig, uncompressed);
-            } finally {
-                System.out.flush();
-                System.err.flush();
-            }
-        }
+    for (int i = 0; i < orig.length; i++) {
+      orig[i] = (byte) (i & 0xf);
     }
+    testAlgorithm(LzoAlgorithm.LZO1X, orig);
+  }
 
-    // Totally RLE.
-    @Test
-    public void testBlank() throws Exception {
-        byte[] orig = new byte[512 * 1024];
-        Arrays.fill(orig, (byte) 0);
-        try {
-            testAlgorithm(LzoAlgorithm.LZO1X, orig);
-        } catch (UnsupportedOperationException e) {
-            // LOG.info("Unsupported algorithm " + algorithm);
-        }
-    }
+  // Essentially uncompressible.
+  @Test
+  public void testRandom() throws Exception {
+    Random r = new Random();
 
-    // Highly cyclic.
-    @Test
-    public void testSequence() throws Exception {
-        byte[] orig = new byte[512 * 1024];
-        for (int i = 0; i < orig.length; i++)
-            orig[i] = (byte) (i & 0xf);
-        try {
-            testAlgorithm(LzoAlgorithm.LZO1X, orig);
-        } catch (UnsupportedOperationException e) {
-            // LOG.info("Unsupported algorithm " + algorithm);
-        }
-    }
+    for (int i = 0; i < 10; i++) {
+      byte[] orig = new byte[256 * 1024];
 
-    // Essentially uncompressible.
-    @Test
-    public void testRandom() throws Exception {
-        Random r = new Random();
-        for (int i = 0; i < 10; i++) {
-            byte[] orig = new byte[256 * 1024];
-            r.nextBytes(orig);
-            try {
-                testAlgorithm(LzoAlgorithm.LZO1X, orig);
-            } catch (UnsupportedOperationException e) {
-                // LOG.info("Unsupported algorithm " + algorithm);
-            }
-        }
+      r.nextBytes(orig);
+      testAlgorithm(LzoAlgorithm.LZO1X, orig);
     }
+  }
 
-    public void testClass(Class<?> type) throws Exception {
-        String name = type.getName();
-        name = name.replace('.', '/') + ".class";
-        LOG.info("Class is " + name);
-        InputStream in = getClass().getClassLoader().getResourceAsStream(name);
-        byte[] orig = IOUtils.toByteArray(in);
-        try {
-            testAlgorithm(LzoAlgorithm.LZO1X, orig);
-        } catch (UnsupportedOperationException e) {
-            // LOG.info("Unsupported algorithm " + algorithm);
-        }
-    }
+  public void testClass(Class<?> type) throws Exception {
+    String name = type.getName();
 
-    @Test
-    public void testClass() throws Exception {
-        testClass(getClass());
-        testClass(Integer.class);
-        testClass(Formatter.class);
-    }
+    name = name.replace('.', '/') + ".class";
+    LOG.info("Class is " + name);
+    InputStream in = getClass().getClassLoader().getResourceAsStream(name);
+    byte[] orig = IOUtils.toByteArray(in);
+
+    testAlgorithm(LzoAlgorithm.LZO1X, orig);
+  }
+
+  @Test
+  public void testClass() throws Exception {
+    testClass(getClass());
+    testClass(Integer.class);
+    testClass(Formatter.class);
+  }
 }

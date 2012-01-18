@@ -18,6 +18,7 @@
  
 package com.hadoop.mapreduce;
 
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -56,14 +57,15 @@ import com.hadoop.compression.lzo.LzoIndex;
 import com.hadoop.compression.lzo.LzoInputFormatCommon;
 import com.hadoop.compression.lzo.LzopCodec;
 
+
 /**
  * Test the LzoTextInputFormat, make sure it splits the file properly and
  * returns the right data.
  */
 public class TestLzoTextInputFormat extends TestCase {
 
-  private static final Log LOG = LogFactory.getLog(TestLzoTextInputFormat.class
-      .getName());
+  private static final Log LOG = LogFactory.getLog(
+      TestLzoTextInputFormat.class.getName());
 
   /*
    * The Hadoop 1.0.0 TextInputFormat uses getFileBlockLocations to
@@ -79,44 +81,50 @@ public class TestLzoTextInputFormat extends TestCase {
     private static final URI uri;
     static {
       try {
-	uri = new URI("test:///");
+        uri = new URI("test:///");
       } catch (Exception e) {
-	throw new IllegalArgumentException("badness", e);
+        throw new IllegalArgumentException("badness", e);
       }
     }
     @Override
     public URI getCanonicalUri() {
       return uri;
     }
+
     @Override
     public URI getUri() {
       return uri;
     }
+
     public Path makeQualified(Path p) {
       return p.makeQualified(this);
     }
+
     public BlockLocation[] getFileBlockLocations(FileStatus file, 
-						 long start, long len
-						 ) throws IOException {
+        long start, long len
+        ) throws IOException {
       if (file == null) {
-	return null;
+        return null;
       }
 
-      if ( (start<0) || (len < 0) ) {
-	throw new IllegalArgumentException("Invalid start or len parameter");
+      if ((start < 0) || (len < 0)) {
+        throw new IllegalArgumentException("Invalid start or len parameter");
       }
 
       if (file.getLen() < start) {
-	return new BlockLocation[0];
+        return new BlockLocation[0];
 
       }
       String[] name = { "localhost:50010" };
       String[] host = { "localhost" };
       long blkSize = file.getBlockSize();
       List<BlockLocation> result = new ArrayList<BlockLocation>();
-      for(long offset=start; offset < len; offset += blkSize) {
-	result.add(new BlockLocation(name, host, offset, 
-				     Math.min(blkSize, len - offset)));
+
+      for (long offset = start; offset < len; offset += blkSize) {
+        result.add(
+            new BlockLocation(name, host, offset
+            , 
+            Math.min(blkSize, len - offset)));
       }
       return result.toArray(new BlockLocation[result.size()]);
     }
@@ -124,10 +132,10 @@ public class TestLzoTextInputFormat extends TestCase {
 
   private MessageDigest md5;
   private final String lzoFileName = "part-r-00001" + 
-    LzopCodec.DEFAULT_LZO_EXTENSION;
+      LzopCodec.DEFAULT_LZO_EXTENSION;
   private Path outputDir;
   
-  //test both bigger outputs and small one chunk ones
+  // test both bigger outputs and small one chunk ones
   private static final int OUTPUT_BIG = 10485760;
   private static final int OUTPUT_SMALL = 50000;
   
@@ -136,6 +144,7 @@ public class TestLzoTextInputFormat extends TestCase {
     super.setUp();
     md5 = MessageDigest.getInstance("MD5");
     Path testBuildData = new Path(System.getProperty("test.build.data"));
+
     outputDir = new Path(System.getProperty("test.scratch"), "outputDir");
   }
 
@@ -144,6 +153,7 @@ public class TestLzoTextInputFormat extends TestCase {
    */
   public void testLzoIndex() {
     LzoIndex index = new LzoIndex();
+
     assertTrue(index.isEmpty());
     index = new LzoIndex(4);
     index.set(0, 0);
@@ -175,7 +185,7 @@ public class TestLzoTextInputFormat extends TestCase {
    * @throws InterruptedException
    */
   public void testWithIndex() throws NoSuchAlgorithmException, IOException,
-      InterruptedException {
+        InterruptedException {
     
     runTest(true, OUTPUT_BIG);
     runTest(true, OUTPUT_SMALL);
@@ -189,7 +199,7 @@ public class TestLzoTextInputFormat extends TestCase {
    * @throws InterruptedException
    */
   public void testWithoutIndex() throws NoSuchAlgorithmException, IOException,
-      InterruptedException {
+        InterruptedException {
     
     runTest(false, OUTPUT_BIG);
     runTest(false, OUTPUT_SMALL);
@@ -206,45 +216,51 @@ public class TestLzoTextInputFormat extends TestCase {
    * @throws InterruptedException
    */
   private void runTest(boolean testWithIndex, int charsToOutput
-		       ) throws IOException,
-				NoSuchAlgorithmException, 
-				InterruptedException {
+      ) throws IOException,
+        NoSuchAlgorithmException, 
+        InterruptedException {
 
     Configuration conf = new Configuration();
+
     conf.set("fs.test.impl", TestFileSystem.class.getName());
     conf.setLong("fs.local.block.size", charsToOutput / 2);
     // reducing block size to force a split of the tiny file
     conf.set("io.compression.codecs", LzopCodec.class.getName());
     
     FileSystem localFs = FileSystem.getLocal(conf);
+
     localFs.delete(outputDir, true);
     localFs.mkdirs(outputDir);
 
     Job job = new Job(conf);
+
     TextOutputFormat.setCompressOutput(job, true);
     TextOutputFormat.setOutputCompressorClass(job, LzopCodec.class);
     TextOutputFormat.setOutputPath(job, outputDir);
 
-    TaskAttemptContext attemptContext = 
-      new TaskAttemptContext(job.getConfiguration(),
-                             new TaskAttemptID("123", 0, false, 1, 2));
+    TaskAttemptContext attemptContext = new TaskAttemptContext(
+        job.getConfiguration(), new TaskAttemptID("123", 0, false, 1, 2));
 
     // create some input data
-    byte[] expectedMd5 = createTestInput(outputDir, localFs, attemptContext, charsToOutput);
+    byte[] expectedMd5 = createTestInput(outputDir, localFs, attemptContext
+        ,
+        charsToOutput);
    
     if (testWithIndex) {
       Path lzoFile = new Path(outputDir, lzoFileName);
+
       LzoIndex.createIndex(localFs, lzoFile);
     }
 
     LzoTextInputFormat inputFormat = new LzoTextInputFormat();
-    TextInputFormat.setInputPaths(job, 
-				  new Path("test://" + 
-					   new File(outputDir.toString()).
-					   getAbsolutePath()));
+
+    TextInputFormat.setInputPaths(job,
+        new Path("test://" + 
+                 new File(outputDir.toString()).getAbsolutePath()));
     
     List<InputSplit> is = inputFormat.getSplits(job);
-    //verify we have the right number of lzo chunks
+
+    // verify we have the right number of lzo chunks
     if (testWithIndex && OUTPUT_BIG == charsToOutput) {
       assertEquals(3, is.size());
     } else {
@@ -255,6 +271,7 @@ public class TestLzoTextInputFormat extends TestCase {
     for (InputSplit inputSplit : is) {
       RecordReader<LongWritable, Text> rr = inputFormat.createRecordReader(
           inputSplit, attemptContext);
+
       rr.initialize(inputSplit, attemptContext);
 
       while (rr.nextKeyValue()) {
@@ -280,9 +297,9 @@ public class TestLzoTextInputFormat extends TestCase {
    * @throws InterruptedException
    */
   private byte[] createTestInput(Path outputDir, FileSystem fs, 
-				 TaskAttemptContext attemptContext, 
-				 int charsToOutput
-				 ) throws IOException, InterruptedException {
+      TaskAttemptContext attemptContext, 
+      int charsToOutput
+      ) throws IOException, InterruptedException {
 
     TextOutputFormat<Text, Text> output = new TextOutputFormat<Text, Text>();
     RecordWriter<Text, Text> rw = null;
@@ -292,13 +309,14 @@ public class TestLzoTextInputFormat extends TestCase {
     try {
       rw = output.getRecordWriter(attemptContext);
 
-      char[] chars = "abcdefghijklmnopqrstuvwxyz\u00E5\u00E4\u00F6"
-          .toCharArray();
+      char[] chars = 
+        "abcdefghijklmnopqrstuvwxyz\u00E5\u00E4\u00F6".toCharArray();
 
       Random r = new Random(System.currentTimeMillis());
       Text key = new Text();
       Text value = new Text();
       int charsMax = chars.length - 1;
+
       for (int i = 0; i < charsToOutput;) {
         i += fillText(chars, r, charsMax, key);
         i += fillText(chars, r, charsMax, value);
@@ -312,12 +330,14 @@ public class TestLzoTextInputFormat extends TestCase {
       if (rw != null) {
         rw.close(attemptContext);
         OutputCommitter committer = output.getOutputCommitter(attemptContext);
+
         committer.commitTask(attemptContext);
         committer.cleanupJob(attemptContext);
       }
     }
 
     byte[] result = md5.digest();
+
     md5.reset();
     return result;
   }
@@ -326,6 +346,7 @@ public class TestLzoTextInputFormat extends TestCase {
     StringBuilder sb = new StringBuilder();
     // get a reasonable string length
     int stringLength = r.nextInt(charsMax * 2);
+
     for (int j = 0; j < stringLength; j++) {
       sb.append(chars[r.nextInt(charsMax)]);
     }
@@ -334,7 +355,7 @@ public class TestLzoTextInputFormat extends TestCase {
   }
 
   public void testIgnoreNonLzoTrue()
-      throws IOException, InterruptedException, NoSuchAlgorithmException {
+    throws IOException, InterruptedException, NoSuchAlgorithmException {
     runTestIgnoreNonLzo(true, OUTPUT_BIG, true);
     runTestIgnoreNonLzo(true, OUTPUT_SMALL, true);
     runTestIgnoreNonLzo(false, OUTPUT_BIG, true);
@@ -342,7 +363,7 @@ public class TestLzoTextInputFormat extends TestCase {
   }
 
   public void testIgnoreNonLzoFalse()
-      throws IOException, InterruptedException, NoSuchAlgorithmException {
+    throws IOException, InterruptedException, NoSuchAlgorithmException {
     runTestIgnoreNonLzo(true, OUTPUT_BIG, false);
     runTestIgnoreNonLzo(true, OUTPUT_SMALL, false);
     runTestIgnoreNonLzo(false, OUTPUT_BIG, false);
@@ -350,9 +371,12 @@ public class TestLzoTextInputFormat extends TestCase {
   }
 
   private void runTestIgnoreNonLzo(boolean testWithIndex, int charsToOutput,
-    boolean ignoreNonLzo) throws IOException, InterruptedException, NoSuchAlgorithmException {
+                                   boolean ignoreNonLzo
+                                   ) throws IOException, InterruptedException,
+                                            NoSuchAlgorithmException {
 
     Configuration conf = new Configuration();
+
     conf.set("fs.test.impl", TestFileSystem.class.getName());
     conf.setLong("fs.local.block.size", charsToOutput / 2);
     // reducing block size to force a split of the tiny file
@@ -360,37 +384,43 @@ public class TestLzoTextInputFormat extends TestCase {
     conf.setBoolean(LzoInputFormatCommon.IGNORE_NONLZO_KEY, ignoreNonLzo);
 
     FileSystem localFs = FileSystem.getLocal(conf);
+
     localFs.delete(outputDir, true);
     localFs.mkdirs(outputDir);
 
     // Create a non-LZO input file and put it alongside the LZO files.
     Path nonLzoFile = new Path(outputDir, "part-r-00001");
     FSDataOutputStream outputStream = localFs.create(nonLzoFile);
+
     outputStream.writeBytes("key1\tvalue1\nkey2\tvalue2\nkey3\tvalue3\n");
     outputStream.close();
 
     Job job = new Job(conf);
+
     TextOutputFormat.setCompressOutput(job, true);
     TextOutputFormat.setOutputCompressorClass(job, LzopCodec.class);
     TextOutputFormat.setOutputPath(job, outputDir);
 
-    TaskAttemptContext attemptContext = 
-        new TaskAttemptContext(job.getConfiguration(),
-			       new TaskAttemptID("123", 0, false, 1, 2));
+    TaskAttemptContext attemptContext = new TaskAttemptContext(
+        job.getConfiguration(), new TaskAttemptID("123", 0, false, 1, 2));
 
     // create some input data
-    byte[] expectedMd5 = createTestInput(outputDir, localFs, attemptContext, charsToOutput);
+    byte[] expectedMd5 = createTestInput(outputDir, localFs, attemptContext
+        ,
+        charsToOutput);
 
     if (testWithIndex) {
       Path lzoFile = new Path(outputDir, lzoFileName);
+
       LzoIndex.createIndex(localFs, lzoFile);
     }
 
     LzoTextInputFormat inputFormat = new LzoTextInputFormat();
-    TextInputFormat.setInputPaths(job, 
-				  new Path("test://" + 
-					   new File(outputDir.toString()).
-					   getAbsolutePath()));
+
+    TextInputFormat.setInputPaths(job,
+                                  new Path("test://" + 
+                                           new File(outputDir.toString()).
+                                           getAbsolutePath()));
 
     // verify we have the right number of input splits
     List<InputSplit> is = inputFormat.getSplits(job);
@@ -398,6 +428,7 @@ public class TestLzoTextInputFormat extends TestCase {
     int numExpectedNonLzoSplits = 0;
     int numActualLzoSplits = 0;
     int numActualNonLzoSplits = 0;
+
     if (!ignoreNonLzo) {
       numExpectedNonLzoSplits += 1;
     }
@@ -411,17 +442,20 @@ public class TestLzoTextInputFormat extends TestCase {
     // Verify that we have the right number of each kind of split and the right
     // data inside the splits.
     List<String> expectedNonLzoLines = new ArrayList<String>();
+
     if (!ignoreNonLzo) {
       expectedNonLzoLines.add("key1\tvalue1");
       expectedNonLzoLines.add("key2\tvalue2");
       expectedNonLzoLines.add("key3\tvalue3");
     }
     List<String> actualNonLzoLines = new ArrayList<String>();
+
     for (InputSplit inputSplit : is) {
       FileSplit fileSplit = (FileSplit) inputSplit;
       Path file = fileSplit.getPath();
       RecordReader<LongWritable, Text> rr = inputFormat.createRecordReader(
           inputSplit, attemptContext);
+
       rr.initialize(inputSplit, attemptContext);
       if (LzoInputFormatCommon.isLzoFile(file.toString())) {
         numActualLzoSplits += 1;

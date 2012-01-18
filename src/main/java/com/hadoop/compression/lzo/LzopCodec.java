@@ -43,8 +43,8 @@ public class LzopCodec extends LzoCodec {
 
   @Override
   public CompressionOutputStream createOutputStream(OutputStream out, 
-						    Compressor compressor
-						    ) throws IOException {
+                                                    Compressor compressor
+                                                    ) throws IOException {
     Configuration conf = getConf();
     LzoCompressor.CompressionStrategy strategy = 
       LzoCodec.getCompressionStrategy(conf);
@@ -54,8 +54,8 @@ public class LzopCodec extends LzoCodec {
 
   @Override
   public CompressionInputStream createInputStream(InputStream in, 
-						  Decompressor decompressor
-						  ) throws IOException {
+                                                  Decompressor decompressor
+                                                  ) throws IOException {
     return new LzopInputStream(in);
   }
 

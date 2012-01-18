@@ -87,8 +87,8 @@ public class LzoLineRecordReader extends RecordReader<LongWritable, Text> {
 
   @Override
   public void initialize(InputSplit genericSplit, 
-			 TaskAttemptContext context
-			 ) throws IOException, InterruptedException {
+                         TaskAttemptContext context
+                         ) throws IOException, InterruptedException {
     FileSplit split = (FileSplit) genericSplit;
 
     start = split.getStart();
@@ -103,7 +103,7 @@ public class LzoLineRecordReader extends RecordReader<LongWritable, Text> {
 
     if (codec == null) {
       throw new IOException("Codec for file " + file + 
-			    " not found, cannot run");
+                            " not found, cannot run");
     }
 
     // open the file and seek to the start of the split
