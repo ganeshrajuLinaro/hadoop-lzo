@@ -383,7 +383,6 @@
   <target name="javadoc-dev" description="Generate javadoc for hadoop developers">
     <mkdir dir="${build.javadoc.dev}"/>
     <javadoc
-      overview="${java.src.dir}/overview.html"
       packagenames="com.hadoop.compression.*"
       destdir="${build.javadoc.dev}"
       author="true"
@@ -412,7 +411,6 @@
           description="Generate javadoc">
     <mkdir dir="${build.javadoc}"/>
     <javadoc
-      overview="${java.src.dir}/overview.html"
       packagenames="com.hadoop.compression.*"
       destdir="${build.javadoc}"
       author="true"
@@ -451,16 +449,9 @@
       <fileset dir="${common.ivy.lib.dir}"/>
     </copy>
 
-    <copy todir="${dist.dir}/lib" includeEmptyDirs="false">
-      <fileset dir="lib">
-        <exclude name="**/native/**"/>
-        <exclude name="*hadoop*.jar"/>
-      </fileset>
+    <copy todir="${dist.dir}">
+	<fileset file="${build.dir}/${final.name}*.jar"/>
     </copy>
-
-	<copy todir="${dist.dir}">
-		<fileset file="${build.dir}/${final.name}*.jar"/>
-	</copy>
 
     <exec dir="${dist.dir}" executable="sh" failonerror="true">
      <env key="BUILD_NATIVE_DIR" value="${build.dir}/native"/>
