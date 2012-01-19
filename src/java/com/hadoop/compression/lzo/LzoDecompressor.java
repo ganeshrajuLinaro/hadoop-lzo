@@ -359,6 +359,10 @@ class LzoDecompressor implements Decompressor {
     return isCurrentBlockUncompressed;
   }
 
+  public int getRemaining() {
+    return compressedDirectBufLen + userBufLen;
+  }
+
   private native static void initIDs();
   private native static int getLzoLibraryVersion();
   private native void init(int decompressor);

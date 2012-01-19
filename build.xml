@@ -36,8 +36,6 @@
   <property name="src.dir" value="${basedir}/src"/>  	
   <property name="java.src.dir" value="${src.dir}/java"/>
   <property name="native.src.dir" value="${basedir}/src/native"/>
-  <property name="lib.dir" value="${basedir}/lib"/>
-  <property name="test.lib.dir" value="${lib.dir}"/>
 
   <property name="build.dir" value="${basedir}/build"/>
   <property name="build.classes" value="${build.dir}/classes"/>
@@ -128,10 +126,6 @@
   <!-- the normal classpath -->
   <path id="classpath">
     <pathelement location="${build.classes}"/>
-    <fileset dir="${lib.dir}">
-      <include name="**/*.jar" />
-      <exclude name="**/excluded/" />
-    </fileset>
     <pathelement location="${conf.dir}"/>
     <path refid="ivy-common.classpath"/>
   </path>
@@ -144,10 +138,6 @@
     <pathelement location="${build.dir}"/>
     <pathelement location="${build.examples}"/>
     <pathelement location="${build.tools}"/>
-    <fileset dir="${test.lib.dir}">
-      <include name="**/*.jar" />
-      <exclude name="**/excluded/" />
-    </fileset>
     <path refid="classpath"/>
   </path>
 
@@ -364,7 +354,7 @@
       <sysproperty key="test.build.extraconf" value="${test.build.extraconf}" />
       <sysproperty key="hadoop.policy.file" value="hadoop-policy.xml"/>
       <sysproperty key="java.library.path"
-       value="${build.native}/lib:${lib.dir}/native/${build.platform}"/>
+       value="${build.native}/lib"/>
       <sysproperty key="install.c++.examples" value="${install.c++.examples}"/>
       <!-- set compile.c++ in the child jvm only if it is set -->
       <syspropertyset dynamic="no">
@@ -473,7 +463,6 @@
 	</copy>
 
     <exec dir="${dist.dir}" executable="sh" failonerror="true">
-     <env key="BASE_NATIVE_LIB_DIR" value="${lib.dir}/native"/>
      <env key="BUILD_NATIVE_DIR" value="${build.dir}/native"/>
      <env key="DIST_LIB_DIR" value="${dist.dir}/lib/native"/>
      <arg line="${native.src.dir}/packageNativeHadoop.sh"/>

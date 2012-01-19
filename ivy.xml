@@ -16,7 +16,7 @@
       extends="client,server"/>
 
     <conf name="mandatory" description="contains the critical  dependencies"
-      extends="commons-logging"/>
+      extends="commons-logging,hadoop"/>
 
     <!--
     These public configurations contain the core dependencies for running hadoop client or server.
@@ -37,6 +37,7 @@
     <conf name="test" extends="common,default" visibility="private"
       description="the classpath needed to run tests"/>
      
+    <conf name="hadoop" visibility="private"/>
     <conf name="commons-logging" visibility="private"/>
     <conf name="log4j" visibility="private"/>
 
@@ -61,6 +62,10 @@
       rev="${commons-logging.version}"
       conf="commons-logging->master"/>
 
+    <dependency org="org.apache.hadoop"
+      name="hadoop-core"
+      rev="${hadoop.version}"
+      conf="hadoop->master"/>
 
     <!--Configuration: commons-logging -->
 
