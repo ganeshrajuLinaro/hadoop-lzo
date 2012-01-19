@@ -217,8 +217,7 @@ public class LzoIndex {
     throws IOException {
 
     Configuration conf = fs.getConf();
-    CompressionCodecFactory factory = new CompressionCodecFactory(conf);
-    CompressionCodec codec = factory.getCodec(lzoFile);
+    CompressionCodec codec = new LzopCodec();
 
     if (null == codec) {
       throw new IOException("Could not find codec for file " + lzoFile +
