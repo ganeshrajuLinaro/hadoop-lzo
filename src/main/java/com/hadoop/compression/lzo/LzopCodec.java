@@ -86,8 +86,8 @@ public class LzopCodec extends LzoCodec {
       byte[] buffer = new byte[256 * 1024];
       int len = in.read(buffer, 0, buffer.length);
       while (len != -1) {
-	mid.write(buffer, 0, len);
-	len = in.read(buffer, 0, buffer.length);
+        mid.write(buffer, 0, len);
+        len = in.read(buffer, 0, buffer.length);
       }
       in.close();
       mid.close();

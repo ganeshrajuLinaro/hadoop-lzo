@@ -62,21 +62,21 @@ public class GenerateData {
     int bytesInLine = 0;
     while (bytes < size) {
       if (bytesInLine >= LINE_WRAP) {
-	for(OutputStream f: files) {
-	  f.write(NEW_LINE);
-	}
-	bytesInLine = 0;
-	bytes += NEW_LINE.length;
+        for(OutputStream f: files) {
+          f.write(NEW_LINE);
+        }
+        bytesInLine = 0;
+        bytes += NEW_LINE.length;
       } else if (bytesInLine != 0) {
-	for(OutputStream f: files) {
-	  f.write(SPACE);
-	}
-	bytesInLine += SPACE.length;
-	bytes += SPACE.length;
+        for(OutputStream f: files) {
+          f.write(SPACE);
+        }
+        bytesInLine += SPACE.length;
+        bytes += SPACE.length;
       }
       byte[] word = words[random.nextInt(words.length)].getBytes(UTF8);
       for(OutputStream f: files) {
-	f.write(word);
+        f.write(word);
       }
       bytesInLine += word.length;
       bytes += word.length;
@@ -84,21 +84,21 @@ public class GenerateData {
   }
 
   private void writeCases(File outputDir, int cases, CompressionCodec... codecs
-			  ) throws IOException {
+                          ) throws IOException {
     for(int i=0; i < cases; ++i) {
       String base = String.format("case-%07d", i);
       OutputStream[] out = new OutputStream[codecs.length+1];
       out[0] = new FileOutputStream(new File(outputDir, base + ".txt"));
       for(int c=0; c < codecs.length; ++c) {
-	OutputStream f = 
-	  new FileOutputStream(new File(outputDir,
-					base + ".txt" +
-					codecs[c].getDefaultExtension()));
-	out[c+1] = codecs[c].createOutputStream(f);
+        OutputStream f = 
+          new FileOutputStream(new File(outputDir,
+                                        base + ".txt" +
+                                        codecs[c].getDefaultExtension()));
+        out[c+1] = codecs[c].createOutputStream(f);
       }
       writeFile(out, random.nextInt(100000));
       for(OutputStream s: out) {
-	s.close();
+        s.close();
       }
     }
   }
