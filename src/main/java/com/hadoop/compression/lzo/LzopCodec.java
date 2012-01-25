@@ -18,6 +18,9 @@
 package com.hadoop.compression.lzo;
 
 import java.io.IOException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -67,5 +70,27 @@ public class LzopCodec extends LzoCodec {
   @Override
   public String getDefaultExtension() {
     return DEFAULT_LZO_EXTENSION;
+  }
+
+  /**
+   * A simple driver that compresses each file from the command line.
+   */
+  public static void main(String[] args) throws Exception {
+    LzopCodec codec = new LzopCodec();
+    codec.setConf(new Configuration());
+    for(String arg: args) {
+      System.out.println("Looking at " + arg);
+      InputStream in = new FileInputStream(new File(arg));
+      OutputStream out = new FileOutputStream(new File(arg + ".lzo"));
+      OutputStream mid = codec.createOutputStream(out);
+      byte[] buffer = new byte[256 * 1024];
+      int len = in.read(buffer, 0, buffer.length);
+      while (len != -1) {
+	mid.write(buffer, 0, len);
+	len = in.read(buffer, 0, buffer.length);
+      }
+      in.close();
+      mid.close();
+    }
   }
 }

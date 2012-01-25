@@ -107,6 +107,38 @@ public class CheckData {
     lzo.setConf(conf);
     LzopCodec lzop = new LzopCodec();
     lzop.setConf(conf);
-    readCases(new File(args[0]), Integer.parseInt(args[1]), lzo, lzop);
+    File dir = new File(args[0]);
+    String[] files = dir.list();
+    boolean haveLzo = false;
+    boolean haveLzop = false;
+    int cases = 0;
+    for(String f: files) {
+      if (f.endsWith(".txt")) {
+	cases += 1;
+      }
+      if (!haveLzo) {
+	haveLzo = f.endsWith(lzo.getDefaultExtension());
+      }
+      if (!haveLzop) {
+	haveLzop = f.endsWith(lzop.getDefaultExtension());
+      }
+    }
+    System.out.println("Checking " + cases + " cases lzo: " + haveLzo +
+		       " lzop: " + haveLzop);
+    if (haveLzo) {
+      if (haveLzop) {
+	readCases(dir, cases, lzo, lzop);
+      } else {
+	readCases(dir, cases, lzo);
+      }
+    } else {
+      if (haveLzop) {
+        readCases(dir, cases, lzop);
+      } else {
+	System.out.println("Nothing to do.");
+	return;
+      }
+    }
+    System.out.println("Done.");
   }
 }
