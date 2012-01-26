@@ -31,15 +31,20 @@ import org.apache.commons.logging.LogFactory;
 public class LzopInputStream extends LzoInputStream {
 
   private static final Log LOG = LogFactory.getLog(LzopInputStream.class);
-  private final int flags;
-  private final CRC32 c_crc32_c;
-  private final CRC32 c_crc32_d;
-  private final Adler32 c_adler32_c;
-  private final Adler32 c_adler32_d;
+  private int flags;
+  private CRC32 c_crc32_c;
+  private CRC32 c_crc32_d;
+  private Adler32 c_adler32_c;
+  private Adler32 c_adler32_d;
   private boolean eof;
 
   public LzopInputStream(InputStream in) throws IOException {
     super(in, new LzoDecompressor1x());
+    resetState();
+  }
+
+  public void resetState() throws IOException {
+    super.resetState();
     this.flags = readHeader();
     this.c_crc32_c = ((flags & LzopConstants.F_CRC32_C) == 0) ?
         null :
@@ -54,7 +59,6 @@ public class LzopInputStream extends LzoInputStream {
         null :
         new Adler32();
     this.eof = false;
-    // logState();
   }
 
   public int getFlags() {

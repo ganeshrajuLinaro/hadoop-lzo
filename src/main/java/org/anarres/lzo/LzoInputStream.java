@@ -68,6 +68,11 @@ public class LzoInputStream extends InputStream {
     return outputBuffer[outputBufferPos++];
   }
 
+  public void resetState() throws IOException {
+    outputBufferLen.value = 0;
+    outputBufferPos = 0;
+  }
+
   @Override
   public int read(byte[] b) throws IOException {
     return read(b, 0, b.length);

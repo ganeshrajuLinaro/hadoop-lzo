@@ -43,10 +43,11 @@ public class LzopOutputStream extends CompressionOutputStream {
 
   @Override
   public void finish() throws IOException {
+    ((org.anarres.lzo.LzopOutputStream) out).finish();
   }
 
   @Override
   public void resetState() throws IOException {
-    throw new UnsupportedOperationException("Not supported yet.");
+    ((org.anarres.lzo.LzopOutputStream) out).resetState();
   }
 }

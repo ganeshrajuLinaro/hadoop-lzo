@@ -39,6 +39,7 @@ public class LzopInputStream extends CompressionInputStream {
 
     @Override
     public void resetState() throws IOException {
+      ((org.anarres.lzo.LzopInputStream) in).resetState();
     }
 
     public int getCompressedChecksumsCount() {

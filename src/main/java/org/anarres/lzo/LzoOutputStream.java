@@ -76,7 +76,10 @@ public class LzoOutputStream extends OutputStream {
     return getCompressor().getConstraints();
   }
 
-  private void reset() {
+  /**
+   * Reset the current state of the stream
+   */
+  protected void reset() {
     inputBufferLen = 0;
     inputHoldoverBuffer = null;
     inputHoldoverBufferPos = -1;

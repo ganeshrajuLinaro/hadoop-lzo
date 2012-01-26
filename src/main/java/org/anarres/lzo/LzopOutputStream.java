@@ -66,7 +66,7 @@ public class LzopOutputStream extends LzoOutputStream {
     this.c_adler32_d = ((flags & LzopConstants.F_ADLER32_D) == 0) ?
         null :
         new Adler32();
-    writeLzopHeader();
+    resetState();
   }
 
   public LzopOutputStream(OutputStream out, LzoCompressor compressor, 
@@ -170,13 +170,43 @@ public class LzopOutputStream extends LzoOutputStream {
   }
 
   /**
+   * Reset the state of the stream
+   */
+  public void resetState() throws IOException {
+    reset();
+    if (c_crc32_c != null) {
+      c_crc32_c.reset();
+    }
+    if (c_crc32_d != null) {
+      c_crc32_d.reset();
+    }
+    if (c_adler32_c != null) {
+      c_adler32_c.reset();
+    }
+    if (c_adler32_d != null) {
+      c_adler32_d.reset();
+    }
+    writeLzopHeader();
+  }
+
+  /**
+   * Finish the compression without closing the underlying output stream.
+   */
+  public void finish() throws IOException {
+    if (!closed) {
+      flush();
+      out.write(new byte[] { 0, 0, 0, 0});
+      out.flush();
+    }
+  }
+
+  /**
    * Writes a null word to the underlying output stream, then closes it.
    */
   @Override
   public void close() throws IOException {
     if (!closed) {
-      flush();
-      out.write(new byte[] { 0, 0, 0, 0});
+      finish();
       super.close();
       closed = true;
     }
