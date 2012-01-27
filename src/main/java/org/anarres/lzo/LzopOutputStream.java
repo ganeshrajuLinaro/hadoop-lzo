@@ -36,7 +36,7 @@ public class LzopOutputStream extends LzoOutputStream {
   private final CRC32 c_crc32_d;
   private final Adler32 c_adler32_c;
   private final Adler32 c_adler32_d;
-  private boolean closed = false;
+  private boolean finished = false;
 
   /**
    * Constructs a new LzopOutputStream.
@@ -174,6 +174,7 @@ public class LzopOutputStream extends LzoOutputStream {
    */
   public void resetState() throws IOException {
     reset();
+    finished = false;
     if (c_crc32_c != null) {
       c_crc32_c.reset();
     }
@@ -193,10 +194,11 @@ public class LzopOutputStream extends LzoOutputStream {
    * Finish the compression without closing the underlying output stream.
    */
   public void finish() throws IOException {
-    if (!closed) {
+    if (!finished) {
       flush();
       out.write(new byte[] { 0, 0, 0, 0});
       out.flush();
+      finished = true;
     }
   }
 
@@ -205,10 +207,7 @@ public class LzopOutputStream extends LzoOutputStream {
    */
   @Override
   public void close() throws IOException {
-    if (!closed) {
-      finish();
-      super.close();
-      closed = true;
-    }
+    finish();
+    out.close();
   }
 }
