@@ -118,7 +118,8 @@ public class LzoDecompressor implements Decompressor {
   private byte[] outputBuffer;
   private int outputBufferPos;
   // Also, end, since we base outputBuffer at 0.
-  private final lzo_uintp outputBufferLen = new lzo_uintp();    
+  private final lzo_uintp outputBufferLen = new lzo_uintp();
+  private boolean done = false;
 
   /**
    * The minimum version of LZO that we can read.
@@ -153,7 +154,8 @@ public class LzoDecompressor implements Decompressor {
 
   private void logState(String when) {
     LOG.info("\n");
-    LOG.info(when + " Output buffer pos=" + outputBufferPos + "; length=" + outputBufferLen);
+    LOG.info(when + " Output buffer pos=" + outputBufferPos + "; length=" + 
+	     outputBufferLen);
     // testInvariants();
   }
 
@@ -190,35 +192,33 @@ public class LzoDecompressor implements Decompressor {
   }
 
   @Override
-    public void setDictionary(byte[] b, int off, int len) {
+  public void setDictionary(byte[] b, int off, int len) {
     // nop
   }
 
   @Override
-    public boolean needsInput() {
+  public boolean needsInput() {
     // logState("Before needsInput");
     return outputBufferLen.value <= 0;
   }
 
   @Override
-    public boolean needsDictionary() {
+  public boolean needsDictionary() {
     return false;
   }
 
   @Override
-    public int getRemaining() {
-    return outputBufferLen.value - outputBufferPos;
+  public int getRemaining() {
+    return outputBufferLen.value;
   }
 
   @Override
-    public boolean finished() {
-    // logState("Before finished");
-    return outputBufferLen.value <= 0;
-    // return false;
+  public boolean finished() {
+    return outputBufferLen.value == 0 && done;
   }
 
   @Override
-   public int decompress(byte[] b, int off, int len) throws IOException {
+  public int decompress(byte[] b, int off, int len) throws IOException {
     if (b == null)
       throw new NullPointerException();
     if (off < 0 || len < 0 || off > b.length - len) {
@@ -239,9 +239,11 @@ public class LzoDecompressor implements Decompressor {
   public void reset() {
     outputBufferPos = 0;
     outputBufferLen.value = 0;
+    done = false;
   }
 
   @Override
-    public void end() {
+  public void end() {
+    done = true;
   }
 }
