@@ -3,7 +3,7 @@
   <groupId>com.hortonworks</groupId>
   <artifactId>hadoop-lzo</artifactId>
   <packaging>jar</packaging>
-  <version>0.1.0</version>
+  <version>1.0.0</version>
   <name>Hadoop GPL Compression</name>
   <url>http://hortonworks.github.com/java-lzo/</url>
   <description>A Java library providing very fast LZO compression and 

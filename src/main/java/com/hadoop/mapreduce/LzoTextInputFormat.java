@@ -76,7 +76,7 @@ public class LzoTextInputFormat extends TextInputFormat {
         // However, always skip over files that end with ".lzo.index", since
         // they are not part of the input.
         if (ignoreNonLzo || 
-            LzoInputFormatCommon.isLzoIndexFile(file.toString())) {
+            LzoIndex.isLzoIndexFile(file.toString())) {
           iterator.remove();
         }
       } else {

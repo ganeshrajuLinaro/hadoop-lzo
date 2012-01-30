@@ -91,8 +91,7 @@ public class LzoIndexer {
         indexInternal(childStatus.getPath(), nestingLevel + 1);
       }
     } else if (lzoPath.toString().endsWith(LZO_EXTENSION)) {
-      Path lzoIndexPath = 
-        new Path(lzoPath.toString() + LzoIndex.LZO_INDEX_SUFFIX);
+      Path lzoIndexPath = LzoIndex.makeIndexName(lzoPath);
 
       if (fs.exists(lzoIndexPath)) {
         LOG.info(getNesting(nestingLevel) +

@@ -40,8 +40,8 @@ import org.apache.hadoop.io.compress.CompressionCodecFactory;
  * Represents the lzo index.
  */
 public class LzoIndex {
-  public static final String LZO_INDEX_SUFFIX = ".index";
-  public static final String LZO_TMP_INDEX_SUFFIX = ".index.tmp";
+  private static final String LZO_INDEX_SUFFIX = ".index";
+  public static final String LZO_TMP_INDEX_SUFFIX = ".tmp";
   public static final long NOT_FOUND = -1;
 
   private long[] blockPositions_;
@@ -164,9 +164,14 @@ public class LzoIndex {
     return end;
   }
 
+  public static Path makeIndexName(Path lzoFile) {
+    Path parent = lzoFile.getParent();
+    String name = lzoFile.getName();
+    return new Path(parent, "." + name + LZO_INDEX_SUFFIX);
+  }
+
   /**
    * Read the index of the lzo file.
-
    * @param fs The index file is on this file system.
    * @param lzoFile the file whose index we are reading -- NOT the
    * index file itself.  That is, pass in filename.lzo, not
@@ -176,13 +181,18 @@ public class LzoIndex {
   public static LzoIndex readIndex(FileSystem fs, 
                                    Path lzoFile) throws IOException {
     FSDataInputStream indexIn = null;
-    Path indexFile = lzoFile.suffix(LZO_INDEX_SUFFIX);
+    Path indexFile = makeIndexName(lzoFile);
 
     try {
       indexIn = fs.open(indexFile);
-    } catch (IOException fileNotFound) {
-      // return empty index, fall back to the unsplittable mode
-      return new LzoIndex();
+    } catch (IOException fnfe) {
+      // try the old index filename
+      try {
+	indexIn = fs.open(lzoFile.suffix(LZO_INDEX_SUFFIX));
+      } catch (IOException fnfe2) {
+	// return empty index, fall back to the unsplittable mode
+	return new LzoIndex();
+      }
     }
 
     // size for a 4GB file (with 256KB lzo blocks)
@@ -229,8 +239,8 @@ public class LzoIndex {
 
     FSDataInputStream is = null;
     FSDataOutputStream os = null;
-    Path outputFile = lzoFile.suffix(LZO_INDEX_SUFFIX);
-    Path tmpOutputFile = lzoFile.suffix(LZO_TMP_INDEX_SUFFIX);
+    Path outputFile = makeIndexName(lzoFile);
+    Path tmpOutputFile = outputFile.suffix(LZO_TMP_INDEX_SUFFIX);
 
     // Track whether an exception was thrown or not, so we know to
     // either delete the tmp index file on failure, or rename it to
@@ -298,6 +308,17 @@ public class LzoIndex {
         fs.rename(tmpOutputFile, outputFile);
       }
     }
+  }
+
+  /**
+   * Checks if the given filename ends in ".lzo.index".
+   *
+   * @param filename filename to check.
+   * @return true if the filename ends in ".lzo.index"
+   */
+  public static boolean isLzoIndexFile(String filename) {
+    return filename.endsWith(LzopCodec.DEFAULT_LZO_EXTENSION + 
+			     LZO_INDEX_SUFFIX);
   }
 }
 

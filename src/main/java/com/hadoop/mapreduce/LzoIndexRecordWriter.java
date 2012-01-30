@@ -76,8 +76,8 @@ public class LzoIndexRecordWriter extends RecordWriter<Path, LongWritable> {
 
     // For /a/b/c.lzo, tmpIndexPath = /a/b/c.lzo.index.tmp,
     // and it is moved to realIndexPath = /a/b/c.lzo.index upon completion.
-    tmpIndexPath = path.suffix(LzoIndex.LZO_TMP_INDEX_SUFFIX);
-    realIndexPath = path.suffix(LzoIndex.LZO_INDEX_SUFFIX);
+    realIndexPath = LzoIndex.makeIndexName(path);
+    tmpIndexPath = realIndexPath.suffix(LzoIndex.LZO_TMP_INDEX_SUFFIX);
 
     // Delete the old index files if they exist.
     fs.delete(tmpIndexPath, false);

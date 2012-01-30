@@ -49,12 +49,6 @@ public abstract class LzoInputFormatCommon {
   public static final boolean DEFAULT_IGNORE_NONLZO = true;
 
   /**
-   * Full extension for LZO index files (".lzo.index").
-   */
-  public static final String FULL_LZO_INDEX_SUFFIX = 
-    LzopCodec.DEFAULT_LZO_EXTENSION + LzoIndex.LZO_INDEX_SUFFIX;
-
-  /**
    * @param conf the Configuration object
    * @return the value of the
    *         <code>lzo.text.input.format.ignore.nonlzo</code> property
@@ -76,13 +70,4 @@ public abstract class LzoInputFormatCommon {
     return filename.endsWith(LzopCodec.DEFAULT_LZO_EXTENSION);
   }
 
-  /**
-   * Checks if the given filename ends in ".lzo.index".
-   *
-   * @param filename filename to check.
-   * @return true if the filename ends in ".lzo.index"
-   */
-  public static boolean isLzoIndexFile(String filename) {
-    return filename.endsWith(FULL_LZO_INDEX_SUFFIX);
-  }
 }

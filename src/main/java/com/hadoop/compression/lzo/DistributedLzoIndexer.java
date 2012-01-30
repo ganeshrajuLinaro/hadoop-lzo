@@ -68,7 +68,7 @@ public class DistributedLzoIndexer extends Configured implements Tool {
           walkPath(childStatus.getPath(), pathFilter, accumulator);
         }
       } else if (path.toString().endsWith(LZO_EXTENSION)) {
-        Path lzoIndexPath = path.suffix(LzoIndex.LZO_INDEX_SUFFIX);
+        Path lzoIndexPath = LzoIndex.makeIndexName(path);
 
         if (fs.exists(lzoIndexPath)) {
           // If the index exists and is of nonzero size, we're already
