@@ -26,9 +26,10 @@ public class LzopOutputStream extends CompressionOutputStream {
 
   public LzopOutputStream(OutputStream out, 
                           LzoCompressor.CompressionStrategy strategy, 
-                          int bufferSize) throws IOException {
+                          int bufferSize, OutputStream indexOut
+			  ) throws IOException {
     super(new org.anarres.lzo.LzopOutputStream(out, strategy.newCompressor(),
-                                               bufferSize, 0));
+                                               bufferSize, 0, indexOut));
   }
 
   @Override

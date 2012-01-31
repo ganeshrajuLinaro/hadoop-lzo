@@ -52,7 +52,7 @@ public class LzopCodec extends LzoCodec {
     LzoCompressor.CompressionStrategy strategy = 
       LzoCodec.getCompressionStrategy(conf);
     int bufferSize = LzoCodec.getBufferSize(conf);
-    return new LzopOutputStream(out, strategy, bufferSize);
+    return new LzopOutputStream(out, strategy, bufferSize, null);
   }
 
   @Override

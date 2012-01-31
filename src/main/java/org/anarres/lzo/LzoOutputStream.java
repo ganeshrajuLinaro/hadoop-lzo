@@ -20,6 +20,8 @@ package org.anarres.lzo;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -38,6 +40,8 @@ public class LzoOutputStream extends OutputStream {
   private final byte[] outputBuffer;
   // Also, end, since we base outputBuffer at 0.
   private final lzo_uintp outputBufferLen = new lzo_uintp();
+  private final OutputStream indexOut;
+  protected long offset;
 
   /**
    * Creates a new compressor using the specified {@link LzoCompressor}.
@@ -45,15 +49,18 @@ public class LzoOutputStream extends OutputStream {
    * @param out the OutputStream to write to
    * @param compressor the compressor to use
    * @param inputBufferSize size of the input buffer to be used.
+   * @param indexOut a stream that will get the index of the block start 
+   *    offset
    */
   public LzoOutputStream(OutputStream out, LzoCompressor compressor, 
-                         int inputBufferSize) {
+                         int inputBufferSize, OutputStream indexOut) {
     this.out = out;
     this.compressor = compressor;
     this.inputBuffer = new byte[inputBufferSize];
     this.outputBuffer = 
       new byte[inputBufferSize + 
                compressor.getCompressionOverhead(inputBufferSize)];
+    this.indexOut = indexOut;
     reset();
   }
 
@@ -61,7 +68,8 @@ public class LzoOutputStream extends OutputStream {
    * Creates a new compressor with the default lzo1x_1 compression.
    */
   public LzoOutputStream(OutputStream out) {
-    this(out, LzoLibrary.getInstance().newCompressor(null, null), 64 * 1024);
+    this(out, LzoLibrary.getInstance().newCompressor(null, null), 256 * 1024,
+	 null);
   }
 
   public LzoCompressor getCompressor() {
@@ -85,6 +93,7 @@ public class LzoOutputStream extends OutputStream {
     inputHoldoverBufferPos = -1;
     inputHoldoverBufferLen = -1;
     outputBufferLen.value = 0;
+    offset = 0;
   }
 
   private void logState(String when) {
@@ -187,12 +196,16 @@ public class LzoOutputStream extends OutputStream {
       inputBufferLen = 0;
       assert testInvariants();
     }
+    flushIndex();
   }
 
   @Override
   public void close() throws IOException {
     flush();
     out.close();
+    if (indexOut != null) {
+      indexOut.close();
+    }
   }
 
   /*
@@ -260,7 +273,7 @@ public class LzoOutputStream extends OutputStream {
       logState("IndexOutOfBoundsException: " + e);
       throw new IOException(e);
     }
-
+    writeOffset(offset);
     writeBlock(buffer, off, len, outputBuffer, 0, outputBufferLen.value);
   }
 
@@ -270,6 +283,7 @@ public class LzoOutputStream extends OutputStream {
     writeInt(inputLen);
     writeInt(outputLen);
     out.write(outputData, outputPos, outputLen);
+    offset += outputLen;
   }
 
   protected void writeInt(int v) throws IOException {
@@ -277,5 +291,28 @@ public class LzoOutputStream extends OutputStream {
     out.write((v >>> 16) & 0xFF);
     out.write((v >>> 8) & 0xFF);
     out.write(v & 0xFF);
+    offset += 4;
+  }
+
+  private ByteBuffer indexBuffer = ByteBuffer.allocate(8*1024);
+  {
+    indexBuffer.order(ByteOrder.BIG_ENDIAN);
+  }
+
+  protected void writeOffset(long offset) throws IOException {
+    if (indexOut != null) {
+      if (indexBuffer.remaining() < 8) {
+	flushIndex();
+      }
+      indexBuffer.putLong(offset);
+    }
+  }
+
+  protected void flushIndex() throws IOException {
+    if (indexOut != null) {
+      indexOut.write(indexBuffer.array(), 0, indexBuffer.position());
+      indexBuffer.rewind();
+      indexOut.flush();
+    }
   }
 }

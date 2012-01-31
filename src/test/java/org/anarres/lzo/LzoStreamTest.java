@@ -48,7 +48,7 @@ public class LzoStreamTest {
     // LOG.info("Original:   " + Arrays.toString(orig));
 
     ByteArrayOutputStream os = new ByteArrayOutputStream();
-    LzoOutputStream cs = new LzoOutputStream(os, compressor, 256);
+    LzoOutputStream cs = new LzoOutputStream(os, compressor, 256, null);
 
     cs.write(orig);
     cs.close();

@@ -73,7 +73,8 @@ public class LzopStreamTest {
         // LOG.info("Original:   " + Arrays.toString(orig));
 
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        LzopOutputStream cs = new LzopOutputStream(os, compressor, 256, flags);
+        LzopOutputStream cs = new LzopOutputStream(os, compressor, 256, flags,
+						   null);
 
         cs.write(orig);
         cs.close();

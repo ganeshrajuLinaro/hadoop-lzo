@@ -136,9 +136,9 @@ public class TestLzopOutputStream extends TestCase {
     // Assumes the flat file is at filename, and the compressed
     // version is filename.lzo
     File textFile = new File(inputDataPath, filename);
-    File lzoOutFile = new File(outputDataPath
-        ,
-        "output_" + filename + new LzopCodec().getDefaultExtension());
+    File lzoOutFile = new File(outputDataPath,
+			       "output_" + filename + 
+			       LzopCodec.DEFAULT_LZO_EXTENSION);
 
     if (lzoOutFile.exists()) {
       lzoOutFile.delete();
@@ -158,8 +158,9 @@ public class TestLzopOutputStream extends TestCase {
     int lzoBufferSize = 256 * 1024;
     LzoCompressor.CompressionStrategy strategy = 
       LzoCompressor.CompressionStrategy.LZO1X_1;
-    LzopOutputStream lzoOut = new LzopOutputStream(
-        new FileOutputStream(lzoOutFile), strategy, lzoBufferSize);
+    LzopOutputStream lzoOut = 
+      new LzopOutputStream(new FileOutputStream(lzoOutFile), strategy, 
+			   lzoBufferSize, null);
 
     // Now read line by line and stream out..
     String textLine;

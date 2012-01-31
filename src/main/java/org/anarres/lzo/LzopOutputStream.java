@@ -51,8 +51,9 @@ public class LzopOutputStream extends LzoOutputStream {
    * </ul>
    */
   public LzopOutputStream(OutputStream out, LzoCompressor compressor, 
-                          int inputBufferSize, long flags) throws IOException {
-    super(out, compressor, inputBufferSize);
+                          int inputBufferSize, long flags, 
+			  OutputStream indexOut) throws IOException {
+    super(out, compressor, inputBufferSize, indexOut);
     this.flags = flags;
     this.c_crc32_c = ((flags & LzopConstants.F_CRC32_C) == 0) ?
         null :
@@ -71,7 +72,7 @@ public class LzopOutputStream extends LzoOutputStream {
 
   public LzopOutputStream(OutputStream out, LzoCompressor compressor, 
                           int inputBufferSize) throws IOException {
-    this(out, compressor, inputBufferSize, 0L);
+    this(out, compressor, inputBufferSize, 0L, null);
   }
 
   public LzopOutputStream(OutputStream out, 
@@ -125,6 +126,7 @@ public class LzopOutputStream extends LzoOutputStream {
       dob.writeInt(hc);
       out.write(LzopConstants.LZOP_MAGIC);
       out.write(dob.getData(), 0, dob.getLength());
+      offset += LzopConstants.LZOP_MAGIC.length + dob.getLength();
     } finally {
       dob.close();
     }
@@ -164,8 +166,10 @@ public class LzopOutputStream extends LzoOutputStream {
 
     if (outputLen < inputLen) {
       out.write(outputData, outputPos, outputLen);
+      offset += outputLen;
     } else {
       out.write(inputData, inputPos, inputLen);
+      offset += inputLen;
     }
   }
 
@@ -197,6 +201,7 @@ public class LzopOutputStream extends LzoOutputStream {
     if (!finished) {
       flush();
       out.write(new byte[] { 0, 0, 0, 0});
+      offset += 4;
       out.flush();
       finished = true;
     }
@@ -208,6 +213,6 @@ public class LzopOutputStream extends LzoOutputStream {
   @Override
   public void close() throws IOException {
     finish();
-    out.close();
+    super.close();
   }
 }

@@ -55,7 +55,7 @@ public class LzoCodec extends Configured implements CompressionCodec {
   // Constant from LzoCompressor.c
   public static final int UNDEFINED_COMPRESSION_LEVEL = -999;
 
-  static LzoCompressor.CompressionStrategy 
+  public static LzoCompressor.CompressionStrategy 
       getCompressionStrategy(Configuration conf) {
     assert conf != null : "Configuration cannot be null!";
     return LzoCompressor.CompressionStrategy.valueOf
@@ -76,7 +76,7 @@ public class LzoCodec extends Configured implements CompressionCodec {
     return conf.getInt(LZO_COMPRESSION_LEVEL_KEY, UNDEFINED_COMPRESSION_LEVEL);
   }
 
-  static int getBufferSize(Configuration conf) {
+  public static int getBufferSize(Configuration conf) {
     assert conf != null : "Configuration cannot be null!";
     return conf.getInt(LZO_BUFFER_SIZE_KEY, DEFAULT_LZO_BUFFER_SIZE);
   }
