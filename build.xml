@@ -200,8 +200,9 @@
     <tstamp>
       <format property="build_time" pattern="MM/dd/yyyy hh:mm aa" timezone="GMT"/>
     </tstamp>
-    <exec executable="${src.dir}/get_build_revision.sh" outputproperty="build_revision" />
-    <exec executable="whoami" outputproperty="build_author"/>
+    <exec executable="sh" outputproperty="build_revision">
+       <arg value="${src.dir}/get_build_revision.sh"/>
+    </exec>
     <exec executable="uname" outputproperty="build_os">
       <arg value="-a"/>
     </exec>
