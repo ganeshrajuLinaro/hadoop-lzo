@@ -1,4 +1,4 @@
-!#/bin/bash
+#!/bin/sh
 CUR_DIR=`pwd`
 PKG_NAME="hadoop-lzo"
 BASEDIR="$( cd "$( dirname "$0" )" && pwd )"
