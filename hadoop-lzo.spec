@@ -1,5 +1,5 @@
-Summary: GPL Compression Libraries for Hadoop
 Name: hadoop-lzo
+Summary: GPL Compression Libraries for Hadoop (jar)
 Version: 0.5.0
 Release: 1
 License: GPL
@@ -13,6 +13,12 @@ Requires: lzo, hadoop
 %define hadoop_home /usr/lib/hadoop
 
 %description
+GPLed Compression Libraries for Hadoop, built at $DATE on $HOST
+
+%package native
+Summary: GPL Compression Libraries for Hadoop (native)
+Group: Development/Libraries
+%description native
 GPLed Compression Libraries for Hadoop, built at $DATE on $HOST
 
 %prep
@@ -32,16 +38,19 @@ chmod +x %{__find_requires}
 
 %build
 
-ant -Dname=%{name} -Dversion=%{version} package
+ant -Dname=%{name} -Dversion=%{version} clean package
 
 %install
 mkdir -p $RPM_BUILD_ROOT/%{hadoop_home}/lib
 install -m644 $RPM_BUILD_DIR/%{name}-%{version}/build/%{name}-%{version}.jar $RPM_BUILD_ROOT/%{hadoop_home}/lib/
+%__rm -rf $RPM_BUILD_DIR/%{name}-%{version}/build/%{name}-%{version}/lib/native/%{name}-%{version}.jar
 rsync -av --no-t $RPM_BUILD_DIR/%{name}-%{version}/build/%{name}-%{version}/lib/native/ $RPM_BUILD_ROOT/%{hadoop_home}/lib/native/
+%__rm -rf $RPM_BUILD_ROOT/%{hadoop_home}/lib/native/lib
 
+%files native
+%{hadoop_home}/lib/native/
 %files
 %{hadoop_home}/lib/%{name}-%{version}.jar
-%{hadoop_home}/lib/native/
 
 %clean
 %__rm -rf $RPM_BUILD_ROOT
