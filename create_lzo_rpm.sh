@@ -30,8 +30,10 @@
     $ANT_HOME/bin/ant -Dversion=$VERSION clean tar
   }
 
-  cp ${BASEDIR}/build/${PKG_NAME}-${VERSION}.tar.gz $RPM_BUILD_DIR/SOURCES/
-  cp ${PKG_NAME}.spec $RPM_BUILD_DIR/SPECS
+  copyHadooplzoArtifacts() {
+    cp ${BASEDIR}/build/${PKG_NAME}-${VERSION}.tar.gz $RPM_BUILD_DIR/SOURCES/
+    cp ${BASEDIR}/${PKG_NAME}.spec $RPM_BUILD_DIR/SPECS
+  }
 
   build_hadoop32lzorpm() {
     unset target
@@ -70,5 +72,6 @@
   }
 
   buildHadooplzo
+  copyHadooplzoArtifacts
   build_hadoop32lzorpm
   build_hadoop64lzorpm
