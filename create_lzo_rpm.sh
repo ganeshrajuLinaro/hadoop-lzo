@@ -49,10 +49,10 @@
     cp ${RPM_BUILD_DIR}/RPMS/i386/hadoop-lzo*.i386.rpm ${OUTPUT_DIR}/
     if [ $osname = "suse11" ];then
       BUILD_ROOT="${RPM_BUILD_DIR}/RPMS"
-      echo hadoop-lzo > ${BUILD_ROOT}/baselibs.conf
+      echo hadoop-lzo-native > ${BUILD_ROOT}/baselibs.conf
       rm -rf /usr/src/packages/RPMS/ia64/*
       rm -rf /usr/src/packages/RPMS/x86_64/*
-      /usr/lib/build/mkbaselibs -c /usr/lib/build/baselibs_global.conf -c ${BUILD_ROOT}/baselibs.conf ${BUILD_ROOT}/i386/hadoop-lzo*.i386.rpm
+      /usr/lib/build/mkbaselibs -c /usr/lib/build/baselibs_global.conf -c ${BUILD_ROOT}/baselibs.conf ${BUILD_ROOT}/i386/hadoop-lzo-native*.i386.rpm
       cp -p /usr/src/packages/RPMS/x86_64/hadoop-lzo*.rpm ${OUTPUT_DIR}/
     fi
   }
