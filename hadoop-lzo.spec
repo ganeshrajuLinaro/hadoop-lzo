@@ -48,8 +48,11 @@ rsync -av --no-t $RPM_BUILD_DIR/%{name}-%{version}/build/%{name}-%{version}/lib/
 %__rm -rf $RPM_BUILD_ROOT/%{hadoop_home}/lib/native/lib
 
 %files native
+%defattr(-,root,root,-)
 %{hadoop_home}/lib/native/
+
 %files
+%defattr(-,root,root,-)
 %{hadoop_home}/lib/%{name}-%{version}.jar
 
 %clean
