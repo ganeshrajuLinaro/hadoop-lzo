@@ -20,6 +20,7 @@
   mkdir -p $RPM_BUILD_DIR/{BUILD,SPECS,SOURCES,RPMS,SRPMS,INSTALL}
 
   buildHadooplzo() {
+    # 32bit Binary tarball
     unset JAVA_HOME
     export JAVA_HOME=${JAVA_HOME_32BIT}
     echo "JAVA_HOME for 32bit HADOOP = $JAVA_HOME"
@@ -28,6 +29,16 @@
     export CFLAGS=-m32
     export CXXFLAGS=-m32
     $ANT_HOME/bin/ant -Dversion=$VERSION clean tar
+
+    #64Bit Binary tarball
+    unset JAVA_HOME
+    export JAVA_HOME=${JAVA_HOME_64BIT}
+    echo "JAVA_HOME for 64bit HADOOP = $JAVA_HOME"
+    export CFLAGS=""
+    export CXXFLAGS=""
+    export CFLAGS=-m64
+    export CXXFLAGS=-m64
+    $ANT_HOME/bin/ant -Dversion=$VERSION tar
   }
 
   copyHadooplzoArtifacts() {
