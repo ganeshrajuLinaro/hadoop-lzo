@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{A8EC1579-8E95-4C0B-A462-4C3D625CDC39}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>hadoop-lzo</RootNamespace>
+    <RootNamespace>gplcompression</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

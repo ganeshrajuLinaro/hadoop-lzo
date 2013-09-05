@@ -374,13 +374,12 @@
                     </javah>
 
                     <exec dir="${build.native}" executable="msbuild" failonerror="true">
-                      <arg value="${basedir}/src/main/native/hadoop-lzo.sln" />
+                      <arg value="${basedir}/src/main/native/gplcompression.sln" />
                       <arg value="/nologo" />
                       <arg value="/p:Configuration=Release;OutDir=${build.native}/" />
                     </exec>
 
-                    <!--<copy file="${build.native}/hadoop-lzo.dll" todir="${build.native}/lib" />-->
-                    <copy file="${build.native}/hadoop-lzo.dll" tofile="${build.native}/lib/gplcompression.dll" /> <!-- TODO: temporary hack, need to rename VS project files -->
+                    <copy file="${build.native}/gplcompression.dll" todir="${build.native}/lib" />
                   </target>
                 </configuration>
               </execution>

@@ -136,7 +136,7 @@ Java_com_hadoop_compression_lzo_LzoDecompressor_initIDs(
 #endif
 
 #ifdef WINDOWS
-  LOAD_DYNAMIC_SYMBOL(lzo_version_t, lzo_version_ptr, env, liblzo2, "lzo2_version");
+  LOAD_DYNAMIC_SYMBOL(lzo_version_t, lzo_version_ptr, env, liblzo2, "lzo_version");
 #endif
 
   liblzo2_version = (NULL == lzo_version_ptr) ? 0

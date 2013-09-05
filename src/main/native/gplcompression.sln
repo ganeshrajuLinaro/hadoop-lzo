@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{EAAEC089-7163-4E57-96A1-B61BF66B3F72}") = "hadoop-lzo", "hadoop-lzo.vcxproj", "{A8EC1579-8E95-4C0B-A462-4C3D625CDC39}"
+Project("{EAAEC089-7163-4E57-96A1-B61BF66B3F72}") = "gplcompression", "gplcompression.vcxproj", "{A8EC1579-8E95-4C0B-A462-4C3D625CDC39}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
