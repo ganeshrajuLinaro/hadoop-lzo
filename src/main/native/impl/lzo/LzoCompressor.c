@@ -239,7 +239,6 @@ Java_com_hadoop_compression_lzo_LzoCompressor_init(
   LOAD_DYNAMIC_SYMBOL(void *, compressor_func_ptr, env, liblzo2, lzo_compressor_function);
   LOAD_DYNAMIC_SYMBOL(void *, compress_level_func_ptr, env, liblzo2,
     "lzo1x_999_compress_level");
-  printf("cn liblzo2 = %X, compress_level_func_ptr = %X\n", liblzo2, compress_level_func_ptr);
 #endif
 
   (*env)->SetLongField(env, this, LzoCompressor_lzoCompressor,
