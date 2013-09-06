@@ -290,6 +290,10 @@
                       <family>windows</family>
                       <message>native-win build only supported on Windows</message>
                     </requireOS>
+                    <requireProperty>
+                      <property>lzo.include</property>
+                      <message>Must provide lzo.include property pointing to location of lzo library headers</message>
+                    </requireProperty>
                   </rules>  
                   <fail>true</fail>
                 </configuration>
@@ -377,7 +381,10 @@
                     <exec dir="${build.native}" executable="msbuild" failonerror="true">
                       <arg value="${basedir}/src/main/native/gplcompression.sln" />
                       <arg value="/nologo" />
-                      <arg value="/p:Configuration=Release;OutDir=${build.native}/" />
+                      <arg value="/p:Configuration=Release" />
+                      <arg value="/p:IntDir=${build.native}/" />
+                      <arg value="/p:OutDir=${build.native}/" />
+                      <arg value="/p:LzoInclude=${lzo.include}/" />
                     </exec>
 
                     <copy file="${build.native}/gplcompression.dll" todir="${build.native}/lib" />
