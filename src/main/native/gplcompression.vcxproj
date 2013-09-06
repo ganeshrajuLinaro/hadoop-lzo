@@ -75,7 +75,7 @@
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup>
-    <IncludePath>$(LzoInclude);%JAVA_HOME%\include;%JAVA_HOME%\include\win32;.\impl;$(IncludePath)</IncludePath>
+    <IncludePath>%C_INCLUDE_PATH%;%JAVA_HOME%\include;%JAVA_HOME%\include\win32;.\impl;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
