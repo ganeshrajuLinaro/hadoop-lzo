@@ -1,9 +1,0 @@
-This is temporary instructions on how to build this project on Windows.
-
-First, get the full source of lzo:
-
-http://www.oberhumer.com/opensource/lzo/download/lzo-2.06.tar.gz
-
-Extract this in C:\.  cd to C:\lzo-2.06).  Run "B\win64\vc_dll.bat".  This will build C:\lzo-2.06\lzo2.dll.
-
-Then, to build the hadoop-lzo native code, run "msbuild hadoop-lzo.sln /nologo /p:Configuration=Release".
