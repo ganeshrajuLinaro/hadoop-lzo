@@ -313,7 +313,7 @@
                   <exportAntProperties>true</exportAntProperties>
                   <target name="set-props" description="sets key properties that are used throughout">
                     <property name="build.native" value="${project.build.directory}/native/${env.OS}-${env.PLATFORM}"/>
-                    <property name="native.src.dir" value="${basedir}/src/main/native"/> <!-- TODO: needed for checking up-to-date -->
+                    <property name="native.src.dir" value="${basedir}/src/main/native"/>
                     <property name="test.build.dir" value="${project.build.directory}/test-classes"/>
                     <property name="test.log.dir" value="${test.build.dir}/logs"/>
                   </target>
@@ -328,7 +328,9 @@
                 <configuration>
                   <exportAntProperties>true</exportAntProperties>
                   <target name="check-native-uptodate" description="checks if native binaries should be rebuilt">
-                    <!-- TODO -->
+                    <uptodate property="native.uptodate" targetfile="${build.native}/lib/gplcompression.dll">
+                      <srcfiles dir="${native.src.dir}" includes="**/*"/>
+                    </uptodate>
                   </target>
                 </configuration>
               </execution>
