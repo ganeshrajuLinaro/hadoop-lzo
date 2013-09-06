@@ -29,6 +29,10 @@ typedef unsigned (__LZO_CDECL *lzo_version_t)();
 static jint liblzo2_version = 0;
 // type of pointer to lzo initialization function
 typedef int (__LZO_CDECL *lzo_init_t) (unsigned,int,int,int,int,int,int,int,int,int);
+// type of pointer to compression level function
+typedef int (__LZO_CDECL *lzo_compress_level_t)(const lzo_bytep, lzo_uint,
+  lzo_bytep, lzo_uintp, lzo_voidp, const lzo_bytep, lzo_uint, lzo_callback_p,
+  int);
 
 // The lzo 'compressors'
 typedef struct {
@@ -119,6 +123,7 @@ static jfieldID LzoCompressor_uncompressedDirectBufLen;
 static jfieldID LzoCompressor_compressedDirectBuf;
 static jfieldID LzoCompressor_directBufferSize;
 static jfieldID LzoCompressor_lzoCompressor;
+static jfieldID LzoCompressor_lzoCompressLevelFunc;
 static jfieldID LzoCompressor_lzoCompressionLevel;
 static jfieldID LzoCompressor_workingMemoryBufLen;
 static jfieldID LzoCompressor_workingMemoryBuf;
@@ -171,6 +176,8 @@ Java_com_hadoop_compression_lzo_LzoCompressor_initIDs(
   LzoCompressor_workingMemoryBuf = (*env)->GetFieldID(env, class, 
                                               "workingMemoryBuf", 
                                               "Ljava/nio/ByteBuffer;");
+  LzoCompressor_lzoCompressLevelFunc = (*env)->GetFieldID(env, class,
+    "lzoCompressLevelFunc", "J");
 
   // record lzo library version
 #ifdef UNIX
@@ -192,6 +199,7 @@ Java_com_hadoop_compression_lzo_LzoCompressor_init(
   void *lzo_init_func_ptr = NULL;
   lzo_init_t lzo_init_function = NULL;
   void *compressor_func_ptr = NULL;
+  void *compress_level_func_ptr = NULL;
   int rv = 0;
   const char *lzo_compressor_function = lzo_compressors[compressor].function;
  
@@ -222,10 +230,16 @@ Java_com_hadoop_compression_lzo_LzoCompressor_init(
 
 #ifdef UNIX
   LOAD_DYNAMIC_SYMBOL(compressor_func_ptr, env, liblzo2, lzo_compressor_function);
+  dlerror();                                 // Clear any existing error
+  LOAD_DYNAMIC_SYMBOL(compress_level_func_ptr, env, liblzo2,
+    "lzo1x_999_compress_level");
 #endif
 
 #ifdef WINDOWS
   LOAD_DYNAMIC_SYMBOL(void *, compressor_func_ptr, env, liblzo2, lzo_compressor_function);
+  LOAD_DYNAMIC_SYMBOL(void *, compress_level_func_ptr, env, liblzo2,
+    "lzo1x_999_compress_level");
+  printf("cn liblzo2 = %X, compress_level_func_ptr = %X\n", liblzo2, compress_level_func_ptr);
 #endif
 
   (*env)->SetLongField(env, this, LzoCompressor_lzoCompressor,
@@ -234,6 +248,9 @@ Java_com_hadoop_compression_lzo_LzoCompressor_init(
   // Save the compressor-function into LzoCompressor_lzoCompressor
   (*env)->SetIntField(env, this, LzoCompressor_workingMemoryBufLen,
                       lzo_compressors[compressor].wrkmem);
+
+  (*env)->SetLongField(env, this, LzoCompressor_lzoCompressLevelFunc,
+                       JLONG(compress_level_func_ptr));
   return;
 }
 
@@ -255,6 +272,8 @@ Java_com_hadoop_compression_lzo_LzoCompressor_compressBytesDirect(
   int compression_level = UNDEFINED_COMPRESSION_LEVEL;
   jobject working_memory_buf = NULL;
   jlong lzo_compressor_funcptr = 0;
+  jlong lzo_compress_level_funcptr = 0;
+  lzo_compress_level_t compressLevelPtr = NULL;
   lzo_bytep uncompressed_bytes = NULL;
   lzo_bytep compressed_bytes = NULL;
   lzo_voidp workmem = NULL;
@@ -328,12 +347,14 @@ Java_com_hadoop_compression_lzo_LzoCompressor_compressBytesDirect(
               workmem);
   } else if (strstr(lzo_compressor_function, "lzo1x_999")
              || strstr(lzo_compressor_function, "lzo1y_999")) {
-/* TODO
     // Compression levels are only available in these codecs.
-    rv = lzo1x_999_compress_level(uncompressed_bytes, uncompressed_direct_buf_len,
-                                  compressed_bytes, &no_compressed_bytes,
-                                  workmem, NULL, 0, 0, compression_level);
-*/
+    lzo_compress_level_funcptr = (*env)->GetLongField(env, this,
+      LzoCompressor_lzoCompressLevelFunc);
+    compressLevelPtr = (lzo_compress_level_t)FUNC_PTR(
+      lzo_compress_level_funcptr);
+    rv = compressLevelPtr(uncompressed_bytes, uncompressed_direct_buf_len,
+      compressed_bytes, &no_compressed_bytes, workmem, NULL, 0, 0,
+      compression_level);
   } else {
     lzo_compress2_t fptr = (lzo_compress2_t) FUNC_PTR(lzo_compressor_funcptr);
     rv = fptr(uncompressed_bytes, uncompressed_direct_buf_len,
