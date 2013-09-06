@@ -386,7 +386,6 @@
                       <arg value="/p:Configuration=Release" />
                       <arg value="/p:IntDir=${build.native}/" />
                       <arg value="/p:OutDir=${build.native}/" />
-                      <arg value="/p:LzoInclude=${lzo.include}/" />
                     </exec>
 
                     <copy file="${build.native}/gplcompression.dll" todir="${build.native}/lib" />
