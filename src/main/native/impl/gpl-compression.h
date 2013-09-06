@@ -41,12 +41,6 @@
 	} \
   }
 
-/* A helper macro to convert the java 'function-pointer' to a void*. */
-#define FUNC_PTR(func_ptr) ((void*)((ptrdiff_t)(func_ptr)))
-
-/* A helper macro to convert the void* to the java 'function-pointer'. */
-#define JLONG(func_ptr) ((jlong)((ptrdiff_t)(func_ptr)))
-
 /**
  * Unix definitions
  */
@@ -153,4 +147,11 @@ static FARPROC WINAPI do_dlsym(JNIEnv *env, HMODULE handle, LPCSTR symbol) {
     THROW(env, "java/lang/InternalError", exception_msg); \
   }
 
+/* A helper macro to convert the java 'function-pointer' to a void*. */
+#define FUNC_PTR(func_ptr) ((void*)((ptrdiff_t)(func_ptr)))
+
+/* A helper macro to convert the void* to the java 'function-pointer'. */
+#define JLONG(func_ptr) ((jlong)((ptrdiff_t)(func_ptr)))
+
 #endif
+
