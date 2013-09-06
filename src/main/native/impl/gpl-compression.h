@@ -31,6 +31,8 @@
 #define UNIX
 #endif
 
+#include "lzo/lzo.h"
+
 /* A helper macro to 'throw' a java exception. */ 
 #define THROW(env, exception_name, message) \
   { \
@@ -152,6 +154,18 @@ static FARPROC WINAPI do_dlsym(JNIEnv *env, HMODULE handle, LPCSTR symbol) {
 
 /* A helper macro to convert the void* to the java 'function-pointer'. */
 #define JLONG(func_ptr) ((jlong)((ptrdiff_t)(func_ptr)))
+
+// type of pointer to lzo function that returns version number
+typedef unsigned (__LZO_CDECL *lzo_version_t)();
+
+// type of pointer to lzo initialization function
+typedef int (__LZO_CDECL *lzo_init_t)(unsigned, int, int, int, int, int, int,
+  int, int, int);
+
+// type of pointer to compression level function
+typedef int (__LZO_CDECL *lzo_compress_level_t)(const lzo_bytep, lzo_uint,
+  lzo_bytep, lzo_uintp, lzo_voidp, const lzo_bytep, lzo_uint, lzo_callback_p,
+  int);
 
 #endif
 

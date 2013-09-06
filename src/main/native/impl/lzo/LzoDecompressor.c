@@ -22,12 +22,8 @@
 
 // The lzo2 library-handle
 static void *liblzo2 = NULL;
-// type of pointer to lzo function that returns version number
-typedef unsigned (__LZO_CDECL *lzo_version_t)();
 // lzo2 library version
 static jint liblzo2_version = 0;
-// type of pointer to lzo initialization function
-typedef int (__LZO_CDECL *lzo_init_t) (unsigned,int,int,int,int,int,int,int,int,int);
 
 #define MSG_LEN 1024
 
@@ -136,7 +132,8 @@ Java_com_hadoop_compression_lzo_LzoDecompressor_initIDs(
 #endif
 
 #ifdef WINDOWS
-  LOAD_DYNAMIC_SYMBOL(lzo_version_t, lzo_version_ptr, env, liblzo2, "lzo_version");
+  LOAD_DYNAMIC_SYMBOL(lzo_version_t, lzo_version_ptr, env, liblzo2,
+    "lzo_version");
 #endif
 
   liblzo2_version = (NULL == lzo_version_ptr) ? 0
@@ -256,9 +253,8 @@ Java_com_hadoop_compression_lzo_LzoDecompressor_decompressBytesDirect(
 	// Decompress
   no_uncompressed_bytes = uncompressed_direct_buf_len;
   fptr = (lzo_decompress_t) FUNC_PTR(lzo_decompressor_funcptr);
-	rv = fptr(compressed_bytes, compressed_direct_buf_len,
-                uncompressed_bytes, &no_uncompressed_bytes,
-                NULL); 
+  rv = fptr(compressed_bytes, compressed_direct_buf_len, uncompressed_bytes,
+    &no_uncompressed_bytes, NULL); 
 
   if (rv == LZO_E_OK) {
     // lzo decompresses all input data
@@ -270,13 +266,14 @@ Java_com_hadoop_compression_lzo_LzoDecompressor_decompressBytesDirect(
 #endif
 
 #ifdef WINDOWS
-    _snprintf_s(exception_msg, MSG_LEN, _TRUNCATE, "%s returned: %d", lzo_decompressor_function, rv);
+    _snprintf_s(exception_msg, MSG_LEN, _TRUNCATE, "%s returned: %d",
+      lzo_decompressor_function, rv);
 #endif
 
     THROW(env, "java/lang/InternalError", exception_msg);
   }
   
-  return (jint)no_uncompressed_bytes;
+  return no_uncompressed_bytes;
 }
 
 /**
