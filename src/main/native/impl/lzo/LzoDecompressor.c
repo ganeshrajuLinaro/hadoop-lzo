@@ -273,7 +273,7 @@ Java_com_hadoop_compression_lzo_LzoDecompressor_decompressBytesDirect(
     THROW(env, "java/lang/InternalError", exception_msg);
   }
   
-  return no_uncompressed_bytes;
+  return (jint)no_uncompressed_bytes;
 }
 
 /**
