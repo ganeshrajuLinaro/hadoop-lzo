@@ -1,0 +1,5 @@
+hadoop-lzo (0.5.0-1) unstable; urgency=low
+
+  * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
+
+ -- Hortonworks Inc <jenkins@hortonworks.com>  Fri, 30 Aug 2013 22:00:15 +0000
