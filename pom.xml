@@ -3,25 +3,13 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.hadoop.gplcompression</groupId>
   <artifactId>hadoop-lzo</artifactId>
-  <version>0.4.18-SNAPSHOT</version>
+  <version>0.4.19-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>hadoop-lzo</name>
   <description>Hadoop-lzo library (Twitter)</description>
   <url>https://github.com/twitter/hadoop-lzo</url>
 
   <dependencies>
-    <dependency>
-      <groupId>org.apache.hadoop</groupId>
-      <artifactId>hadoop-common</artifactId>
-      <version>${hadoop.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.hadoop</groupId>
-      <artifactId>hadoop-mapreduce-client-core</artifactId>
-      <version>${hadoop.version}</version>
-      <scope>provided</scope>
-    </dependency>
     <dependency>
       <groupId>commons-logging</groupId>
       <artifactId>commons-logging</artifactId>
@@ -106,16 +94,44 @@
 
   <profiles>
     <profile>
-      <id>mac-jdk6-profile</id>
+      <id>default-profile</id>
       <activation>
-        <file>
-          <missing>${java.home}/../lib/tools.jar</missing>
-          <exists>${java.home}/../Classes/classes.jar</exists>
-        </file>
+        <activeByDefault>true</activeByDefault>
       </activation>
-      <properties>
-        <tools.jar>${java.home}/../Classes/classes.jar</tools.jar>
-      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>org.apache.hadoop</groupId>
+          <artifactId>hadoop-common</artifactId>
+          <version>${hadoop.version}</version>
+          <scope>provided</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.hadoop</groupId>
+          <artifactId>hadoop-mapreduce-client-core</artifactId>
+          <version>${hadoop.version}</version>
+          <scope>provided</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>hadoop-old</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>org.apache.hadoop</groupId>
+          <artifactId>hadoop-core</artifactId>
+          <version>1.0.4</version>
+          <scope>provided</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.hadoop</groupId>
+          <artifactId>hadoop-test</artifactId>
+          <version>1.0.4</version>
+          <scope>provided</scope>
+        </dependency>
+      </dependencies>
     </profile>
     <profile>
       <id>native-non-win</id>
@@ -439,7 +455,7 @@
             <artifactId>tools</artifactId>
             <version>1.6</version>
             <scope>system</scope>
-            <systemPath>${tools.jar}</systemPath>
+            <systemPath>${java.home}/../lib/tools.jar</systemPath>
           </dependency>
         </dependencies>
       </plugin>
