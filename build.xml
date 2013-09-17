@@ -447,7 +447,9 @@
     <mkdir dir="${dist.dir}/docs"/>
 
     <copy todir="${dist.dir}/lib" includeEmptyDirs="false" flatten="true">
-      <fileset dir="${common.ivy.lib.dir}"/>
+      <fileset dir="${common.ivy.lib.dir}">
+         <exclude name="**/commons-logging-*.jar"/>
+      </fileset>
     </copy>
 
     <copy todir="${dist.dir}">
