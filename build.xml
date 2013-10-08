@@ -450,6 +450,7 @@
       <fileset dir="${common.ivy.lib.dir}">
          <exclude name="**/commons-*.jar"/>
          <exclude name="**/hadoop-*.jar"/>
+         <exclude name="**/junit-*.jar"/>
       </fileset>
     </copy>
 
