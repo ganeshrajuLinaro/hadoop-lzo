@@ -17,7 +17,7 @@ override_dh_auto_build:
 
 override_dh_auto_install:
 	dh_install build/hadoop-lzo-0.5.0.jar /usr/lib/hadoop/lib
-	dh_install build/native/Linux-amd64-64/lib /usr/lib/hadoop/lib/native/Linux-amd64-64
+	dh_install build/native/Linux-amd64-64/lib/* /usr/lib/hadoop/lib/native/Linux-amd64-64/``
 
 override_dh_auto_clean:
 	${ANT_HOME}/bin/ant -Dversion=0.5.0 clean
