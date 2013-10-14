@@ -455,7 +455,7 @@
     </copy>
 
     <copy todir="${dist.dir}">
-	<fileset file="${build.dir}/${final.name}.jar"/>
+	<fileset file="${build.dir}/${final.name}*.jar"/>
     </copy>
 
     <exec dir="${dist.dir}" executable="sh" failonerror="true">
