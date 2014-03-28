@@ -16,7 +16,7 @@
       extends="client,server"/>
 
     <conf name="mandatory" description="contains the critical  dependencies"
-      extends="commons-logging,hadoop"/>
+      extends="commons-logging,hadoop-common,hadoop-hdfs,hadoop-mapreduce-client-app,hadoop-yarn-api,hadoop-mapreduce-client-core,hadoop-mapreduce-client-jobclient,hadoop-annotations"/>
 
     <!--
     These public configurations contain the core dependencies for running hadoop client or server.
@@ -38,6 +38,13 @@
       description="the classpath needed to run tests"/>
      
     <conf name="hadoop" visibility="private"/>
+    <conf name="hadoop-common" visibility="private"/>
+    <conf name="hadoop-hdfs" visibility="private"/>
+    <conf name="hadoop-mapreduce-client-app" visibility="private"/>
+    <conf name="hadoop-yarn-api" visibility="private"/>
+    <conf name="hadoop-mapreduce-client-core" visibility="private"/>
+    <conf name="hadoop-mapreduce-client-jobclient" visibility="private"/>
+    <conf name="hadoop-annotations" visibility="private"/>
     <conf name="commons-logging" visibility="private"/>
     <conf name="log4j" visibility="private"/>
 
@@ -62,11 +69,39 @@
       rev="${commons-logging.version}"
       conf="commons-logging->master"/>
 
-    <dependency org="org.apache.hadoop"
+    <!--<dependency org="org.apache.hadoop"
       name="hadoop-core"
       rev="${hadoop.version}"
       conf="hadoop->master"/>
-
+-->
+    <dependency org="org.apache.hadoop"
+      name="hadoop-common"
+      rev="${hadoop.version}"
+      conf="hadoop-common->master"/>
+    <dependency org="org.apache.hadoop"
+      name="hadoop-hdfs"
+      rev="${hadoop.version}"
+      conf="hadoop-hdfs->master"/>
+    <dependency org="org.apache.hadoop"
+      name="hadoop-mapreduce-client-app"
+      rev="${hadoop.version}"
+      conf="hadoop-mapreduce-client-app->master"/>
+    <dependency org="org.apache.hadoop"
+      name="hadoop-yarn-api"
+      rev="${hadoop.version}"
+      conf="hadoop-yarn-api->master"/>
+    <dependency org="org.apache.hadoop"
+      name="hadoop-mapreduce-client-core"
+      rev="${hadoop.version}"
+      conf="hadoop-mapreduce-client-core->master"/>
+    <dependency org="org.apache.hadoop"
+      name="hadoop-mapreduce-client-jobclient"
+      rev="${hadoop.version}"
+      conf="hadoop-mapreduce-client-core->master"/>
+    <dependency org="org.apache.hadoop"
+      name="hadoop-annotations"
+      rev="${hadoop.version}"
+      conf="hadoop-annotations->master"/>
     <!--Configuration: commons-logging -->
 
     <!--log4J is not optional until commons-logging.properties is stripped out of the JAR -->
