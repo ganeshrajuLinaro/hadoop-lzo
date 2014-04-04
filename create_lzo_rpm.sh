@@ -5,8 +5,11 @@
   BASEDIR="$( cd "$( dirname "$0" )" && pwd )"
   osname="$(lsb_release -si | tr '[:upper:]' '[:lower:]'| cut -d" " -f1)$(lsb_release -sr | cut -d. -f1)"
 
-  [[ -z "${VERSION}" ]] && VERSION="0.5.0"
+  [[ -z "${VERSION}" ]] && VERSION="0.6.0"
   [[ -z "${RELEASE}" ]] && RELEASE="1"
+  [[ -z "${hadoop_version}" ]] && echo "hadoop_version not set"
+  [[ -z "${nexus_proxy_url}" ]] && echo "nexus_proxy_url not set"
+  [[ -z "${JAVA_HOME}" ]] && echo "JAVA_HOME not set"
 
   BUILD_DIR=${BUILD_DIR:-$BASEDIR/build-$PKG_NAME}
 
@@ -20,25 +23,10 @@
   mkdir -p $RPM_BUILD_DIR/{BUILD,SPECS,SOURCES,RPMS,SRPMS,INSTALL}
 
   buildHadooplzo() {
-    # 32bit Binary tarball
-    unset JAVA_HOME
-    export JAVA_HOME=${JAVA_HOME_32BIT}
-    echo "JAVA_HOME for 32bit HADOOP = $JAVA_HOME"
-    export CFLAGS=""
-    export CXXFLAGS=""
-    export CFLAGS=-m32
-    export CXXFLAGS=-m32
-    $ANT_HOME/bin/ant -Dversion=$VERSION clean tar
-
     #64Bit Binary tarball
-    unset JAVA_HOME
-    export JAVA_HOME=${JAVA_HOME_64BIT}
-    echo "JAVA_HOME for 64bit HADOOP = $JAVA_HOME"
-    export CFLAGS=""
-    export CXXFLAGS=""
-    export CFLAGS=-m64
-    export CXXFLAGS=-m64
-    $ANT_HOME/bin/ant -Dversion=$VERSION tar
+    $ANT_HOME/bin/ant -Dversion=$VERSION \
+        -Dhadoop.verison=${hadoop_version} \
+        -Drepo.maven.org=${nexus_proxy_url} clean tar
   }
 
   copyHadooplzoArtifacts() {
@@ -46,43 +34,11 @@
     cp ${BASEDIR}/${PKG_NAME}.spec $RPM_BUILD_DIR/SPECS
   }
 
-  build_hadoop32lzorpm() {
-    unset target
-    export target='--target i386'
-    unset JAVA_HOME
-    export JAVA_HOME=${JAVA_HOME_32BIT}
-    export PATH=$JAVA_HOME_32BIT:$PATH
-    echo "PATH = $PATH"
-    echo "JAVA_HOME for 32bit HADOOP = $JAVA_HOME"
-    export CFLAGS="-m32"
-    export CXXFLAGS="-m32" 
-    rpmbuild -ba ${target} --define "_topdir ${RPM_BUILD_DIR} " ${RPM_BUILD_DIR}/SPECS/hadoop-lzo.spec
-    cp ${RPM_BUILD_DIR}/RPMS/i386/hadoop-lzo*.i386.rpm ${OUTPUT_DIR}/
-    if [ $osname = "suse11" ];then
-      BUILD_ROOT="${RPM_BUILD_DIR}/RPMS"
-      echo hadoop-lzo-native > ${BUILD_ROOT}/baselibs.conf
-      rm -rf /usr/src/packages/RPMS/ia64/*
-      rm -rf /usr/src/packages/RPMS/x86_64/*
-      /usr/lib/build/mkbaselibs -c /usr/lib/build/baselibs_global.conf -c ${BUILD_ROOT}/baselibs.conf ${BUILD_ROOT}/i386/hadoop-lzo-native*.i386.rpm
-      cp -p /usr/src/packages/RPMS/x86_64/hadoop-lzo*.rpm ${OUTPUT_DIR}/
-    fi
-  }
-
-  build_hadoop64lzorpm() {
-    unset target
-    export target=''
-    unset JAVA_HOME
-    export JAVA_HOME=${JAVA_HOME_64BIT}
-    echo "JAVA_HOME for 64bit HADOOP = $JAVA_HOME"
-    export CFLAGS=""
-    export CXXFLAGS=""
-    export CFLAGS=-m64
-    export CXXFLAGS=-m64
+  build_hadooplzorpm() {
     rpmbuild -ba  --define "_topdir ${RPM_BUILD_DIR} " ${RPM_BUILD_DIR}/SPECS/hadoop-lzo.spec
     cp ${RPM_BUILD_DIR}/RPMS/x86_64/hadoop-lzo*.rpm ${OUTPUT_DIR}/
   }
 
   buildHadooplzo
   copyHadooplzoArtifacts
-  build_hadoop32lzorpm
-  build_hadoop64lzorpm
+  build_hadooplzorpm
