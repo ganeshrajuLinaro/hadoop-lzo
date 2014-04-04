@@ -13,10 +13,12 @@ export DH_VERBOSE=1
 	dh $@ 
 
 override_dh_auto_build:
-	${ANT_HOME}/bin/ant -Dversion=0.5.0 package
+	${ANT_HOME}/bin/ant -Dversion=${hadoop_lzo_version} \
+		-Dhadoop.version=${hadoop_version} \
+		-Drepo.maven.org=${nexus_proxy_url} clean tar
 
 override_dh_auto_install:
-	dh_install build/hadoop-lzo-0.5.0.jar /usr/lib/hadoop/lib
+	dh_install build/hadoop-lzo-${hadoop_lzo_version}.jar /usr/lib/hadoop/lib
 	dh_install build/native/Linux-amd64-64/lib/* /usr/lib/hadoop/lib/native/Linux-amd64-64/``
 
 override_dh_auto_clean:
