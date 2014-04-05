@@ -22,25 +22,11 @@ Group: Development/Libraries
 GPLed Compression Libraries for Hadoop, built at $DATE on $HOST
 
 %prep
-%setup -n %{name}-%{version}
-
-# Requires: exclude libjvm.so since it generally isn't installed
-# on the system library path, and we don't want to have to install
-# with --nodeps
-# RHEL doesn't have nice macros. Oh well. Do it old school.
-%define our_req_script %{name}-find-req.sh
-cat <<__EOF__ > %{our_req_script}
-#!/bin/sh
-%{__find_requires} | grep -v libjvm
-__EOF__
-%define __find_requires %{_builddir}/%{name}-%{version}/%{our_req_script}
-chmod +x %{__find_requires}
 
 %build
-
-ant -Dname=%{name} -Dversion=%{version} \
-    clean package -Dhadoop.verison=${hadoop_version} \
-    -Drepo.maven.org=${nexus_proxy_url}
+ cd hadoop-lzo-%{version} 
+ ant -Dversion=%{version} clean tar -Dhadoop.verison=${hadoop_version} -Drepo.maven.org=${nexus_proxy_url}
+ cp $RPM_BUILD_DIR/%{name}-%{version}/build/hadoop-lzo-%{version}.tar.gz $RPM_SOURCE_DIR/.
 
 %install
 mkdir -p $RPM_BUILD_ROOT/%{hadoop_home}/lib
