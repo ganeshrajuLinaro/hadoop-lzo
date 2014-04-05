@@ -22,7 +22,7 @@ Group: Development/Libraries
 GPLed Compression Libraries for Hadoop, built at $DATE on $HOST
 
 %prep
-%setup
+%setup -n %{name}-%{version}
 
 # Requires: exclude libjvm.so since it generally isn't installed
 # on the system library path, and we don't want to have to install
@@ -38,7 +38,9 @@ chmod +x %{__find_requires}
 
 %build
 
-ant -Dname=%{name} -Dversion=%{version} clean package
+ant -Dname=%{name} -Dversion=%{version} \
+    clean package -Dhadoop.verison=${hadoop_version} \
+    -Drepo.maven.org=${nexus_proxy_url}
 
 %install
 mkdir -p $RPM_BUILD_ROOT/%{hadoop_home}/lib

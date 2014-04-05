@@ -31,7 +31,7 @@
 
   copyHadooplzoArtifacts() {
     tar xvzf ../${PKG_NAME}-${VERSION}.tar.gz ../${PKG_NAME}-${VERSION} --exclude=.git*
-    cp ${BASEDIR}/../${PKG_NAME}-${VERSION}.tar.gz $RPM_BUILD_DIR/SOURCES/
+    cp ${BASEDIR} ${PKG_NAME}-${VERSION}.tar.gz $RPM_BUILD_DIR/SOURCES/
     cp ${BASEDIR}/${PKG_NAME}.spec $RPM_BUILD_DIR/SPECS
   }
 
