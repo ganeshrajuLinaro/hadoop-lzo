@@ -25,7 +25,8 @@ GPLed Compression Libraries for Hadoop, built at $DATE on $HOST
 
 %build
  cd hadoop-lzo-%{version} 
- ${ANT_HOME}/bin/ant -Dversion=%{version} clean tar -Dhadoop.verison=${hadoop_version} -Drepo.maven.org=${nexus_proxy_url}
+ echo "hadoop.version=${hadoop_version}" >> ivy/libraries.properties
+ ${ANT_HOME}/bin/ant -Dversion=%{version} clean tar -Dhadoop.version=${hadoop_version} -Drepo.maven.org=${nexus_proxy_url}
  cp $RPM_BUILD_DIR/%{name}-%{version}/build/hadoop-lzo-%{version}.tar.gz $RPM_SOURCE_DIR/.
 
 %install
