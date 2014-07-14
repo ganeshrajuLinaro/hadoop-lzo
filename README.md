@@ -134,7 +134,7 @@ Note that if you forget to index an .lzo file, the job will work but will proces
 
 This package, hadoop-lzo, is only interface code.  To utilize it you must have the lzo2 codec implementation library installed in the canonical place for your operating system.  
 
-For Linux, the library may be installed as package 'lzo' from the HDP-UTILS repository at https://public-repo-1.hortonworks.com/HDP-UTILS-1.1.0.17/repos/<os> (where <os> may be replaced with any of: centos5, centos6, debian6, suse11, ubuntu12) using yum, zypper, or apt, as appropriate for your OS.
+For Linux, the library may be installed as package 'lzo' from the HDP-UTILS repository at https://public-repo-1.hortonworks.com/HDP-UTILS-1.1.0.17/repos/&lt;os&gt; (where &lt;os&gt; may be replaced with any of: centos5, centos6, debian6, suse11, ubuntu12) using yum, zypper, or apt, as appropriate for your OS.
 
 For Windows, the library may be downloaded from https://public-repo-1.hortonworks.com/HDP-Win/lzo/2.06/lzo2.dll and provided to the HDP Installer along with the hadoop-lzo jar and the gplcompression dll.
 
