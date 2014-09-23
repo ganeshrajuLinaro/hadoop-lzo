@@ -10,7 +10,7 @@ BuildRequires: ant, ant-nodeps, gcc-c++, lzo-devel
 Requires: lzo, hadoop
 %define _use_internal_dependency_generator 0
 
-%define hadoop_home /usr/hdp/current/common/share/lzo/%{version}
+%define hadoop_home /usr/hdp/current/share/lzo/%{version}
 
 %description
 GPLed Compression Libraries for Hadoop, built at $DATE on $HOST
