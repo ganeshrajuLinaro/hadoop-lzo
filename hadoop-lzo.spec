@@ -7,7 +7,7 @@ Source0: %{name}-%{version}.tar.gz
 Group: Development/Libraries
 Buildroot: %{_tmppath}/%{name}-%{version}
 BuildRequires: ant, ant-nodeps, gcc-c++, lzo-devel
-Requires: lzo, hadoop
+Requires: lzo
 %define _use_internal_dependency_generator 0
 
 %define hadoop_home /usr/hdp/current/share/lzo/%{version}
