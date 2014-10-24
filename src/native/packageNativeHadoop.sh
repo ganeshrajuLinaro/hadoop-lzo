@@ -26,13 +26,14 @@
 #  * DIST_LIB_DIR
 # All these are setup by build.xml.
 #
-
+set -x
 TAR='tar cf -'
 UNTAR='tar xfBp -'
 
 # Copy the pre-built libraries in $BASE_NATIVE_LIB_DIR
-if [ -d $BASE_NATIVE_LIB_DIR ]
+if [[ -d "$BASE_NATIVE_LIB_DIR" ]]
 then
+  echo " AI m "
   for platform in `ls $BASE_NATIVE_LIB_DIR`
   do
     if [ ! -d $DIST_LIB_DIR/$platform ]
@@ -47,7 +48,7 @@ then
 fi
 
 # Copy the custom-built libraries in $BUILD_DIR
-if [ -d $BUILD_NATIVE_DIR ]
+if [[ -d "$BUILD_NATIVE_DIR" ]]
 then 
   for platform in `ls $BUILD_NATIVE_DIR`
   do
