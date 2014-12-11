@@ -82,7 +82,7 @@
   <property name="javac.debug" value="on"/>
   <property name="javac.optimize" value="on"/>
   <property name="javac.deprecation" value="on"/>
-  <property name="javac.version" value="1.6"/>
+  <property name="javac.version" value="1.7"/>
   <property name="javac.args" value=""/>
   <property name="javac.args.warnings" value="-Xlint:unchecked"/>
 
@@ -254,10 +254,10 @@
     <mkdir dir="${build.native}/lib"/>
     <mkdir dir="${build.native}/src/com/hadoop/compression/lzo"/>
 
-    <javah classpath="${build.classes}"
-  	   destdir="${build.native}/src/com/hadoop/compression/lzo"
+    <javah destdir="${build.native}/src/com/hadoop/compression/lzo"
            force="yes"
-  	   verbose="yes">
+           verbose="yes">
+      <classpath refid="classpath"/>
       <class name="com.hadoop.compression.lzo.LzoCompressor" />
       <class name="com.hadoop.compression.lzo.LzoDecompressor" />
     </javah>
