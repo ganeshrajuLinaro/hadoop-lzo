@@ -433,14 +433,39 @@
 
         <group title="Java" packages="com.hadoop.compression.*"/>
     </javadoc>
-  </target>     
+  </target>
+
+  <!-- ================================================================== -->
+  <!-- Make hadooplzo-sources.jar-->
+  <!-- ================================================================== -->
+  <target name="src-jar"
+  	description="Create source jars">
+    <jar jarfile="${build.dir}/${final.name}-sources.jar">
+    	<fileset file="${basedir}/README.md"/>
+    	<fileset dir="${basedir}/ivy"/>
+    	<fileset file="${basedir}/ivy.xml"/>
+    	<fileset file="${basedir}/build.xml"/>
+    	<fileset dir="${java.src.dir}"/>
+    </jar>
+  </target>		    
+  
+  <!-- ================================================================== -->
+  <!-- Make hadooplzo-test.jar-->
+  <!-- ================================================================== -->
+  <target name="test-jar"
+  	description="Create test jars">
+    <jar jarfile="${build.dir}/${final.name}-test.jar">
+    	<fileset file="${basedir}/README.md"/>
+    	<fileset dir="${test.src.dir}"/>
+    </jar>
+  </target>		    
 
   <!-- ================================================================== -->
   <!-- D I S T R I B U T I O N                                            -->
   <!-- ================================================================== -->
   <!--                                                                    -->
   <!-- ================================================================== -->
-  <target name="package" depends="compile, jar, javadoc"
+  <target name="package" depends="compile, jar, src-jar, test-jar, javadoc"
           description="Build distribution">
     <mkdir dir="${dist.dir}"/>
     <mkdir dir="${dist.dir}/lib"/>
