@@ -91,14 +91,13 @@
   <!-- IVY properties set here -->
   <property name="ivy.dir" location="ivy" />
   <loadproperties srcfile="${ivy.dir}/libraries.properties"/>
-  <property name="ivy.jar" location="${ivy.dir}/ivy-${ivy.version}.jar"/>
   <property name="mvnrepo" value="http://repo2.maven.org/maven2"/>
   <property name="ivy_repo_url" value="${mvnrepo}/org/apache/ivy/ivy/${ivy.version}/ivy-${ivy.version}.jar"/>
   <property name="ivysettings.xml" location="${ivy.dir}/ivysettings.xml" />
   <property name="ivy.org" value="com.hadoop.compression"/>
-  <property name="build.dir" location="build" />
   <property name="dist.dir" value="${build.dir}/${final.name}"/>
   <property name="build.ivy.dir" location="${build.dir}/ivy" />
+  <property name="ivy.jar" location="${build.ivy.dir}/ivy-${ivy.version}.jar"/>
   <property name="build.ivy.lib.dir" location="${build.ivy.dir}/lib" />
   <property name="common.ivy.lib.dir" location="${build.ivy.lib.dir}/${ant.project.name}/common"/>
   <property name="build.ivy.report.dir" location="${build.ivy.dir}/report" />
@@ -550,7 +549,7 @@
     </condition>
   </target>
 
-  <target name="ivy-download" description="To download ivy" unless="offline">
+  <target name="ivy-download" depends="ivy-init-dirs" description="To download ivy" unless="offline">
     <get src="${ivy_repo_url}" dest="${ivy.jar}" usetimestamp="true"/>
   </target>
 
@@ -559,7 +558,7 @@
   classloader. Also note how we skip loading Ivy if it is already there, just
   to make sure all is well.
   -->
-  <target name="ivy-init-antlib" depends="ivy-download,ivy-init-dirs,ivy-probe-antlib" unless="ivy.found">
+  <target name="ivy-init-antlib" depends="ivy-download,ivy-probe-antlib" unless="ivy.found">
     <typedef uri="antlib:org.apache.ivy.ant" onerror="fail"
       loaderRef="ivyLoader">
       <classpath>
